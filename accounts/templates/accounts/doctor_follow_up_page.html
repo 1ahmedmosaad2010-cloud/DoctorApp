@@ -1,0 +1,107 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}إعادة كشف | MY DOCTOR{% endblock %}
+
+{% block body_class %}doctor-follow-up-page{% endblock %}
+
+{% block extra_css %}
+<style>
+.follow-page{max-width:850px;margin:25px auto;padding:15px}
+.follow-card{background:#fff;border:1px solid #ddd6fe;border-radius:22px;padding:20px;box-shadow:0 10px 30px rgba(76,29,149,.08)}
+.follow-card h1{margin:0 0 6px;color:#5b21b6;font-size:25px}
+.follow-card .subtitle{color:#64748b;margin-bottom:18px}
+.patient-box{background:#faf5ff;border:1px solid #ddd6fe;border-radius:14px;padding:13px;margin-bottom:18px}
+.patient-box div{padding:5px 0;color:#334155}
+.follow-label{font-size:12px;font-weight:900;color:#5b21b6;margin:9px 0 6px}
+.day-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px}
+.day-btn{flex:0 0 105px;border:1px solid #ddd6fe;border-radius:11px;background:#fff;padding:9px 6px;color:#475569;font-weight:900;cursor:pointer}
+.day-btn strong,.day-btn span{display:block}.day-btn span{margin-top:4px;font-weight:700}.day-btn.selected{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.selected-day{padding:10px;border-radius:10px;background:#ede9fe;color:#5b21b6;text-align:center;font-weight:900;margin-bottom:10px}
+.time-list{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.time-btn{border:1px solid #ddd6fe;background:#fff;color:#475569;border-radius:9px;padding:9px 4px;font-weight:800;cursor:pointer}.time-btn.selected{background:#7c3aed;color:#fff}.time-btn:disabled{background:#e5e7eb;color:#6b7280;cursor:not-allowed;text-decoration:line-through}
+textarea{width:100%;box-sizing:border-box;min-height:90px;margin-top:14px;border:1px solid #d8b4fe;border-radius:10px;padding:10px;font-family:inherit;resize:vertical}
+.follow-submit{width:100%;border:0;border-radius:11px;padding:12px;background:#7c3aed;color:#fff;font-family:inherit;font-weight:900;cursor:pointer;margin-top:10px}.back-link{display:block;text-align:center;margin-top:10px;padding:11px;border-radius:11px;background:#f1f5f9;color:#475569;text-decoration:none;font-weight:900}
+.empty{grid-column:1/-1;padding:12px;border-radius:9px;background:#f8fafc;color:#94a3b8;text-align:center}
+@media(max-width:700px){.follow-page{margin:10px auto;padding:10px}.follow-card{padding:15px}.follow-card h1{font-size:21px}.time-list{grid-template-columns:repeat(2,1fr)}.day-btn{flex-basis:92px}}
+</style>
+{% endblock %}
+
+{% block content %}
+{{ follow_up_days|json_script:'follow-up-page-days' }}
+<div class="follow-page">
+    <div class="follow-card">
+        <h1>🔄 إعادة كشف</h1>
+        <div class="subtitle">اختر موعد إعادة الكشف للمريض من الصفحة دي مباشرة.</div>
+
+        <div class="patient-box">
+            <div><strong>المريض:</strong> {{ appointment.patient.get_full_name|default:appointment.patient.username }}</div>
+            <div><strong>الكشف الأصلي:</strong> {{ appointment.date|date:'Y-m-d' }} — {{ appointment.time|time:'h:i A' }}</div>
+        </div>
+
+        <form method="POST" action="{{ submit_url }}" id="follow-page-form">
+            {% csrf_token %}
+            <div class="follow-label">📅 اختر اليوم</div>
+            <div class="day-strip">
+                {% for day in follow_up_days %}
+                <button type="button" class="day-btn" data-date="{{ day.date }}" data-day-name="{{ day.weekday_name }}" data-day-date="{{ day.date|slice:'5:' }}">{{ day.weekday_name }}<span>{{ day.date|slice:'5:' }}</span></button>
+                {% endfor %}
+            </div>
+            <div class="selected-day" id="selected-day">اختر اليوم أولًا</div>
+
+            <div class="follow-label">🕐 اختر الساعة</div>
+            <div class="time-list" id="time-list"><div class="empty">اختر اليوم أولًا</div></div>
+
+            <input type="hidden" name="date" id="follow-date" required>
+            <input type="hidden" name="time" id="follow-time" required>
+            <textarea name="notes" placeholder="تفاصيل إعادة الكشف..."></textarea>
+            <button type="submit" class="follow-submit" id="follow-submit-button">✅ تأكيد إعادة الكشف</button>
+            <a href="{% url 'doctor_appointments' %}" class="back-link">↩️ رجوع للحجوزات</a>
+        </form>
+    </div>
+</div>
+
+<script>
+(function(){
+    const days = JSON.parse(document.getElementById('follow-up-page-days').textContent);
+    const dateInput = document.getElementById('follow-date');
+    const timeInput = document.getElementById('follow-time');
+    const selectedDay = document.getElementById('selected-day');
+    const timeList = document.getElementById('time-list');
+    const form = document.getElementById('follow-page-form');
+
+    function formatTime(value){
+        const parts=String(value).split(':'); let h=parseInt(parts[0],10); const m=parts[1]||'00';
+        if(Number.isNaN(h)) return value; const suffix=h>=12?'PM':'AM'; h=h%12||12; return String(h).padStart(2,'0')+':'+m+' '+suffix;
+    }
+
+    document.querySelectorAll('.day-btn').forEach(btn=>btn.addEventListener('click',function(){
+        const day=days.find(x=>x.date===this.dataset.date);
+        document.querySelectorAll('.day-btn').forEach(x=>x.classList.remove('selected'));
+        this.classList.add('selected'); dateInput.value=this.dataset.date; timeInput.value='';
+        selectedDay.textContent='📅 اليوم المختار: '+this.dataset.dayName+' — '+this.dataset.dayDate;
+        timeList.innerHTML='';
+        if(!day || !day.available){ timeList.innerHTML='<div class="empty">الدكتور لا يعمل في هذا اليوم.</div>'; return; }
+        if(!day.slots || !day.slots.length){ timeList.innerHTML='<div class="empty">لا توجد ساعات متاحة في هذا اليوم.</div>'; return; }
+        day.slots.forEach(slot=>{
+            const b=document.createElement('button'); b.type='button'; b.className='time-btn'; b.textContent=(slot.available?'🕐 ':'🔒 ')+formatTime(slot.label);
+            if(!slot.available){b.disabled=true;b.title=slot.reason||'الموعد محجوز';}else{b.addEventListener('click',()=>{document.querySelectorAll('.time-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');timeInput.value=slot.value;});}
+            timeList.appendChild(b);
+        });
+    }));
+
+    form.addEventListener('submit',function(e){
+        if(!dateInput.value || !timeInput.value){
+            e.preventDefault();
+            alert(!dateInput.value?'من فضلك اختر اليوم.':'من فضلك اختر الساعة.');
+            return;
+        }
+
+        const submitButton=document.getElementById('follow-submit-button');
+        if(submitButton){
+            submitButton.disabled=true;
+            submitButton.textContent='⏳ جاري تأكيد إعادة الكشف...';
+        }
+    });
+})();
+</script>
+{% endblock %}

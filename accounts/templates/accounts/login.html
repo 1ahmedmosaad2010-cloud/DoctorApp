@@ -1,0 +1,593 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    تسجيل الدخول | MY DOCTOR
+{% endblock %}
+
+{% block body_class %}
+    login-body
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .login-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #eef7ff, #f8fbff);
+        font-family: Arial, Tahoma, sans-serif;
+        direction: rtl;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        max-width: 1200px;
+        min-height: 680px;
+        background: #ffffff;
+        border-radius: 28px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        box-shadow: 0 20px 60px rgba(25, 118, 210, 0.12);
+    }
+
+    /* =========================
+       INFORMATION SIDE
+    ========================== */
+
+    .login-info {
+        background: linear-gradient(145deg, #eaf5ff, #f7fbff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+        text-align: center;
+    }
+
+    .info-content {
+        width: 100%;
+        max-width: 480px;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 55px;
+    }
+
+    .brand-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: #1976d2;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: 0 8px 20px rgba(25, 118, 210, 0.25);
+    }
+
+    .brand-name {
+        color: #1769aa;
+        font-size: 32px;
+        font-weight: 800;
+        direction: ltr;
+    }
+
+    .login-info h1 {
+        color: #102a43;
+        font-size: 40px;
+        line-height: 1.35;
+        margin: 0 0 25px;
+    }
+
+    .login-info > .info-content > p {
+        color: #52677a;
+        font-size: 18px;
+        line-height: 2;
+        margin-bottom: 35px;
+    }
+
+    .features {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        text-align: right;
+        margin-top: 25px;
+    }
+
+    .feature {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: #263f55;
+        font-size: 17px;
+    }
+
+    .feature-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1976d2;
+        box-shadow: 0 5px 15px rgba(25, 118, 210, 0.10);
+        flex-shrink: 0;
+    }
+
+
+    /* =========================
+       LOGIN FORM SIDE
+    ========================== */
+
+    .login-form-side {
+        padding: 55px 65px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: white;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .form-header h2 {
+        margin: 0 0 10px;
+        color: #102a43;
+        font-size: 32px;
+    }
+
+    .form-header p {
+        margin: 0;
+        color: #718096;
+        font-size: 16px;
+    }
+
+
+    /* =========================
+       ERRORS
+    ========================== */
+
+    .error-message {
+        background: #fff1f1;
+        border: 1px solid #ffcaca;
+        color: #c62828;
+        padding: 13px 16px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        text-align: center;
+        font-size: 15px;
+    }
+
+
+    /* =========================
+       FORM
+    ========================== */
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #243b53;
+        font-weight: bold;
+        margin-bottom: 9px;
+        font-size: 15px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 19px;
+        z-index: 2;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        height: 56px;
+        border: 1px solid #d9e5ef;
+        border-radius: 13px;
+        background: #fbfdff;
+        padding: 0 50px 0 16px;
+        font-size: 16px;
+        color: #243b53;
+        outline: none;
+        transition: 0.2s;
+        direction: rtl;
+    }
+
+    .input-wrapper input:focus {
+        border-color: #1976d2;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.08);
+    }
+
+    .input-wrapper input::placeholder {
+        color: #a5b4c3;
+    }
+
+
+    /* =========================
+       LOGIN BUTTON
+    ========================== */
+
+    .login-button {
+        width: 100%;
+        height: 56px;
+        border: none;
+        border-radius: 13px;
+        background: linear-gradient(135deg, #1976d2, #2684e8);
+        color: white;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(25, 118, 210, 0.20);
+        transition: 0.2s;
+    }
+
+    .login-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 13px 30px rgba(25, 118, 210, 0.28);
+    }
+
+
+    /* =========================
+       DIVIDER
+    ========================== */
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: #9aa9b8;
+        margin: 25px 0;
+        font-size: 14px;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        height: 1px;
+        background: #e4ebf1;
+        flex: 1;
+    }
+
+
+    /* =========================
+       REGISTER
+    ========================== */
+
+    .register-link {
+        width: 100%;
+        height: 54px;
+        border: 1px solid #1976d2;
+        border-radius: 13px;
+        color: #1976d2;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .register-link:hover {
+        background: #eef7ff;
+    }
+
+
+    /* =========================
+       HOME
+    ========================== */
+
+    .home-link {
+        display: block;
+        text-align: center;
+        margin-top: 25px;
+        color: #6b7f92;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .home-link:hover {
+        color: #1976d2;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================== */
+
+    @media (max-width: 850px) {
+
+        .login-page {
+            padding: 15px;
+        }
+
+        .login-wrapper {
+            grid-template-columns: 1fr;
+            min-height: auto;
+        }
+
+        .login-info {
+            padding: 40px 25px;
+        }
+
+        .brand {
+            margin-bottom: 30px;
+        }
+
+        .brand-name {
+            font-size: 26px;
+        }
+
+        .login-info h1 {
+            font-size: 30px;
+        }
+
+        .login-info > .info-content > p {
+            font-size: 16px;
+        }
+
+        .login-form-side {
+            padding: 40px 25px;
+        }
+
+        .features {
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+</style>
+
+
+<div class="login-page">
+
+    <div class="login-wrapper">
+
+
+        <!-- =========================
+             LEFT INFORMATION
+        ========================== -->
+
+        <section class="login-info">
+
+            <div class="info-content">
+
+                <div class="brand">
+
+                    <div class="brand-icon">
+                        🩺
+                    </div>
+
+                    <div class="brand-name">
+                        MY DOCTOR
+                    </div>
+
+                </div>
+
+
+                <h1>
+                    رعايتك الصحية
+                    <br>
+                    تبدأ من هنا
+                </h1>
+
+
+                <p>
+                    سجل دخولك للوصول إلى حسابك
+                    ومتابعة حجوزاتك ورسائلك
+                    والتواصل مع الأطباء بسهولة.
+                </p>
+
+
+                <div class="features">
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            📅
+                        </div>
+
+                        <span>
+                            متابعة المواعيد والحجوزات
+                        </span>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            💬
+                        </div>
+
+                        <span>
+                            التواصل المباشر مع الأطباء
+                        </span>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            🔔
+                        </div>
+
+                        <span>
+                            استقبال إشعارات مهمة
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             LOGIN FORM
+        ========================== -->
+
+        <section class="login-form-side">
+
+            <div class="form-header">
+
+                <h2>
+                    تسجيل الدخول
+                </h2>
+
+                <p>
+                    أدخل بيانات حسابك للمتابعة
+                </p>
+
+            </div>
+
+
+            {% if error %}
+
+                <div class="error-message">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="error-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+
+            <form
+                method="post"
+                action="{% url 'login' %}"
+            >
+
+                {% csrf_token %}
+
+
+                <div class="form-group">
+
+                    <label for="username">
+                        اسم المستخدم
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            👤
+                        </span>
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="اكتب اسم المستخدم"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        كلمة المرور
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            🔒
+                        </span>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="اكتب كلمة المرور"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    تسجيل الدخول
+                </button>
+
+            </form>
+
+
+            <div class="divider">
+                أو
+            </div>
+
+
+            <a
+                href="{% url 'register' %}"
+                class="register-link"
+            >
+                👤 إنشاء حساب جديد
+            </a>
+
+
+            <a
+                href="{% url 'home' %}"
+                class="home-link"
+            >
+                ← العودة إلى الصفحة الرئيسية
+            </a>
+
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}

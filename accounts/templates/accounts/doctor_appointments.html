@@ -1,0 +1,3775 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    حجوزات المرضى | MY DOCTOR
+{% endblock %}
+
+{% block body_class %}
+    doctor-appointments-body
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.doctor-appointments-page{
+    max-width:1450px;
+    margin:0 auto;
+    padding:25px 18px 50px;
+    box-sizing:border-box;
+    position:relative;
+    min-height:100vh;
+
+    background:
+        radial-gradient(circle at 10% 6%, rgba(13,148,136,.12), transparent 24%),
+        radial-gradient(circle at 90% 8%, rgba(37,99,235,.10), transparent 22%),
+        radial-gradient(circle at 82% 88%, rgba(124,58,237,.08), transparent 24%),
+        linear-gradient(145deg,#f8fbff 0%,#f1f8f7 46%,#f8f7ff 100%);
+}
+
+.doctor-appointments-page::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+
+    background:
+        linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35)),
+        repeating-linear-gradient(
+            135deg,
+            transparent 0 22px,
+            rgba(15,118,110,.018) 22px 24px
+        );
+}
+
+.doctor-appointments-page > *{
+    position:relative;
+    z-index:1;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header{
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.96),
+        rgba(244,253,251,.92)
+    );
+
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:20px;
+    padding:20px;
+    margin-bottom:14px;
+
+    box-shadow:0 14px 38px rgba(15,23,42,.08);
+    overflow:hidden;
+    position:relative;
+}
+
+.page-header::after{
+    content:"";
+    position:absolute;
+    left:22px;
+    right:22px;
+    bottom:0;
+    height:3px;
+    border-radius:99px;
+    background:linear-gradient(
+        90deg,
+        #0f766e,
+        #2563eb,
+        #7c3aed
+    );
+}
+
+.page-header h1{
+    margin:0 0 6px;
+    color:#0f172a;
+    font-size:28px;
+    font-weight:800;
+}
+
+.page-header p{
+    margin:0;
+    color:#64748b;
+}
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.django-messages{
+    margin-bottom:12px;
+}
+
+.django-message{
+    padding:10px 14px;
+    border-radius:10px;
+    background:#ecfdf5;
+    color:#047857;
+    font-weight:700;
+    margin-bottom:7px;
+    text-align:center;
+}
+
+.django-message.error{
+    background:#fef2f2;
+    color:#b91c1c;
+}
+
+/* =========================================================
+   FIXED CONTROLS
+========================================================= */
+
+.doctor-fixed-controls{
+    position:sticky;
+    top:0;
+    z-index:1200;
+
+    padding:8px 8px 12px;
+
+    background:rgba(247,251,252,.83);
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:22px;
+
+    backdrop-filter:blur(14px);
+    box-shadow:0 14px 38px rgba(15,23,42,.08);
+}
+
+/* =========================================================
+   MAIN TABS
+========================================================= */
+
+.appointment-tabs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+
+    padding:5px;
+    margin-bottom:10px;
+
+    background:rgba(226,232,240,.76);
+    border-radius:12px;
+}
+
+.doctor-tab{
+    padding:11px;
+    border-radius:9px;
+    text-decoration:none;
+    text-align:center;
+    font-weight:800;
+    color:#475569;
+    transition:.2s ease;
+}
+
+.doctor-tab:hover{
+    background:rgba(255,255,255,.72);
+    color:#0f172a;
+    transform:translateY(-1px);
+}
+
+.doctor-tab.active{
+    background:linear-gradient(
+        135deg,
+        #0f766e,
+        #0d9488
+    );
+    color:#fff;
+    box-shadow:0 8px 20px rgba(13,148,136,.22);
+}
+
+.doctor-tab.follow.active{
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #9333ea
+    );
+    color:#fff;
+    box-shadow:0 8px 20px rgba(124,58,237,.22);
+}
+
+/* =========================================================
+   PERIOD TABS
+========================================================= */
+
+.doctor-period-tabs,
+.follow-period-tabs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+
+    padding:6px;
+    margin-bottom:10px;
+
+    border-radius:12px;
+}
+
+.doctor-period-tabs{
+    background:rgba(255,255,255,.72);
+    border:1px solid rgba(148,163,184,.22);
+}
+
+.follow-period-tabs{
+    background:#ede9fe;
+}
+
+.doctor-period-tab,
+.follow-period-tab{
+    width:100%;
+    border:0;
+    border-radius:9px;
+    padding:11px;
+
+    background:transparent;
+    font-size:12px;
+    font-weight:900;
+
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.doctor-period-tab{
+    color:#475569;
+}
+
+.follow-period-tab{
+    color:#5b21b6;
+}
+
+.doctor-period-tab:hover,
+.follow-period-tab:hover{
+    transform:translateY(-1px);
+}
+
+.doctor-period-tab.active{
+    background:linear-gradient(
+        135deg,
+        #0f766e,
+        #0d9488
+    );
+    color:#fff;
+}
+
+.doctor-period-tab.past.active,
+.follow-period-tab.past.active{
+    background:linear-gradient(
+        135deg,
+        #475569,
+        #64748b
+    );
+    color:#fff;
+}
+
+.follow-period-tab.active{
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #9333ea
+    );
+    color:#fff;
+}
+
+/* =========================================================
+   NEW BOOKINGS
+========================================================= */
+
+.new-bookings-panel{
+    background:linear-gradient(
+        145deg,
+        rgba(255,255,255,.97),
+        rgba(249,252,253,.94)
+    );
+
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:20px;
+
+    padding:14px;
+    margin-bottom:14px;
+
+    box-shadow:0 14px 38px rgba(15,23,42,.08);
+}
+
+.new-bookings-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.new-bookings-title{
+    font-size:16px;
+    font-weight:900;
+    color:#0f172a;
+}
+
+.new-bookings-subtitle{
+    font-size:11px;
+    color:#64748b;
+    margin-top:3px;
+}
+
+.new-bookings-count{
+    min-width:34px;
+    height:34px;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#eef2ff;
+    color:#3730a3;
+    font-weight:900;
+}
+
+.new-bookings-list{
+    display:grid;
+    gap:7px;
+}
+
+.new-booking-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+
+    padding:10px;
+
+    border-radius:11px;
+    background:linear-gradient(
+        145deg,
+        #ffffff,
+        #f6fafb
+    );
+
+    border:1px solid rgba(148,163,184,.15);
+
+    transition:.2s ease;
+}
+
+.new-booking-row:hover{
+    transform:translateY(-2px);
+    box-shadow:0 7px 16px rgba(15,23,42,.06);
+}
+
+.new-booking-info{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    min-width:0;
+}
+
+.new-booking-info strong{
+    font-size:13px;
+    color:#0f172a;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.new-booking-info span{
+    font-size:11px;
+    color:#64748b;
+}
+
+.new-booking-actions{
+    display:flex;
+    gap:5px;
+    flex-shrink:0;
+}
+
+.new-booking-actions form{
+    margin:0;
+}
+
+.quick-accept,
+.quick-reject{
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    border:0;
+    border-radius:8px;
+    padding:7px 9px;
+
+    font-size:11px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.quick-accept{
+    background:linear-gradient(
+        135deg,
+        #16a34a,
+        #15803d
+    );
+    color:#fff;
+}
+
+.quick-reject{
+    background:linear-gradient(
+        135deg,
+        #ef4444,
+        #dc2626
+    );
+    color:#fff;
+}
+
+/* =========================================================
+   NEXT APPOINTMENT
+========================================================= */
+
+.next-appointment-panel,
+.next-follow-up-panel{
+    margin:0 0 14px;
+    padding:14px 16px;
+
+    background:linear-gradient(
+        145deg,
+        rgba(255,255,255,.97),
+        rgba(248,252,252,.92)
+    );
+
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:20px;
+
+    box-shadow:0 14px 38px rgba(15,23,42,.08);
+    overflow:hidden;
+}
+
+.next-appointment-title,
+.next-follow-up-title{
+    margin-bottom:8px;
+    text-align:right;
+
+    color:#0f172a;
+    font-size:16px;
+    font-weight:900;
+}
+
+.next-appointment-card,
+.next-follow-up-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+}
+
+.next-appointment-item,
+.next-follow-up-item{
+    padding:10px 9px;
+    border-radius:10px;
+    text-align:center;
+
+    border:1px solid rgba(148,163,184,.14);
+}
+
+.next-appointment-item{
+    background:linear-gradient(
+        145deg,
+        #fbfefe,
+        #f1f8f7
+    );
+}
+
+.next-follow-up-item{
+    background:linear-gradient(
+        145deg,
+        #fdfaff,
+        #f6f0ff
+    );
+}
+
+.next-appointment-label,
+.next-follow-up-label{
+    display:block;
+    margin-bottom:4px;
+
+    font-size:10px;
+    font-weight:800;
+}
+
+.next-appointment-label{
+    color:#64748b;
+}
+
+.next-follow-up-label{
+    color:#7c3aed;
+}
+
+.next-appointment-value,
+.next-follow-up-value{
+    display:block;
+    font-size:12px;
+    font-weight:900;
+    line-height:1.5;
+}
+
+.next-appointment-value{
+    color:#0f172a;
+}
+
+.next-follow-up-value{
+    color:#334155;
+}
+
+.next-appointment-status{
+    margin-top:9px;
+    padding:8px 10px;
+
+    border-radius:9px;
+    background:#ecfdf5;
+    color:#047857;
+
+    text-align:center;
+    font-size:11px;
+    font-weight:900;
+}
+
+.next-appointment-chat{
+    margin-top:9px !important;
+}
+
+/* =========================================================
+   DAY SELECTOR
+========================================================= */
+
+.schedule-day-selector{
+    margin:0 0 14px;
+    padding:10px;
+
+    background:rgba(255,255,255,.92);
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:18px;
+
+    box-shadow:0 14px 38px rgba(15,23,42,.08);
+}
+
+.schedule-day-selector-title{
+    margin-bottom:7px;
+
+    text-align:center;
+    color:#0f172a;
+
+    font-size:13px;
+    font-weight:900;
+}
+
+.schedule-day-strip{
+    display:flex;
+    gap:7px;
+
+    overflow-x:auto;
+    padding:2px;
+
+    scrollbar-width:thin;
+}
+
+.schedule-day-btn{
+    flex:0 0 96px;
+    min-width:96px;
+
+    border:1px solid #dbe3ee;
+    border-radius:10px;
+
+    padding:8px 6px;
+
+    background:linear-gradient(
+        145deg,
+        #ffffff,
+        #f8fafc
+    );
+
+    color:#475569;
+
+    cursor:pointer;
+    font-weight:900;
+    font-size:10px;
+
+    transition:.2s ease;
+}
+
+.schedule-day-btn:hover{
+    transform:translateY(-2px);
+    border-color:rgba(13,148,136,.32);
+}
+
+.schedule-day-btn strong,
+.schedule-day-btn span{
+    display:block;
+}
+
+.schedule-day-btn span{
+    margin-top:3px;
+    font-weight:700;
+}
+
+.schedule-day-btn.active{
+    background:linear-gradient(
+        135deg,
+        #0f766e,
+        #0d9488
+    );
+
+    color:#fff;
+    border-color:transparent;
+
+    box-shadow:0 8px 18px rgba(13,148,136,.20);
+}
+
+/* =========================================================
+   FOLLOW-UP DAY BAR
+========================================================= */
+
+.follow-up-day-strip{
+    width:100%;
+    overflow:hidden;
+
+    padding:6px;
+
+    border:1px solid #ddd6fe;
+    border-radius:11px;
+
+    background:#faf5ff;
+    box-sizing:border-box;
+}
+
+.follow-up-day-track{
+    display:flex;
+    gap:7px;
+
+    overflow-x:auto;
+    padding:2px;
+
+    scrollbar-width:thin;
+}
+
+.follow-up-day-btn{
+    flex:0 0 92px;
+    min-width:92px;
+
+    padding:8px 6px;
+
+    border:1px solid #ddd6fe;
+    border-radius:9px;
+
+    background:#fff;
+    color:#475569;
+
+    font-size:10px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.follow-up-day-btn strong,
+.follow-up-day-btn span{
+    display:block;
+}
+
+.follow-up-day-btn span{
+    margin-top:3px;
+    font-weight:700;
+}
+
+.follow-up-day-btn.selected,
+.follow-up-filter-btn.active{
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #9333ea
+    ) !important;
+
+    color:#fff !important;
+    border-color:#7c3aed !important;
+
+    box-shadow:0 8px 18px rgba(124,58,237,.18);
+}
+
+/* =========================================================
+   FOLLOW-UP FORM
+========================================================= */
+
+.follow-up-panel{
+    display:none;
+
+    margin:10px 0 16px;
+    padding:12px;
+
+    background:linear-gradient(
+        145deg,
+        rgba(255,255,255,.98),
+        rgba(250,245,255,.94)
+    );
+
+    border:2px solid #ddd6fe;
+    border-radius:20px;
+
+    box-shadow:0 14px 38px rgba(76,29,149,.10);
+}
+
+.follow-up-panel.open{
+    display:block !important;
+}
+
+.follow-up-panel-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+
+    margin-bottom:8px;
+}
+
+.follow-up-panel-title{
+    color:#5b21b6;
+    font-size:14px;
+    font-weight:900;
+}
+
+.follow-up-panel-subtitle{
+    margin-top:3px;
+    color:#64748b;
+    font-size:11px;
+}
+
+.follow-up-close{
+    width:30px;
+    height:30px;
+
+    border:0;
+    border-radius:8px;
+
+    background:#f1f5f9;
+    color:#475569;
+
+    font-size:20px;
+    cursor:pointer;
+}
+
+.picker-label{
+    font-size:10px;
+    font-weight:800;
+    color:#5b21b6;
+    margin:7px 0 5px;
+}
+
+.follow-up-selected-day{
+    margin-top:7px;
+    padding:8px;
+
+    border-radius:9px;
+    background:#ede9fe;
+    border:1px solid #ddd6fe;
+
+    color:#5b21b6;
+    text-align:center;
+
+    font-size:11px;
+    font-weight:900;
+}
+
+.follow-up-time-list{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:6px;
+}
+
+.time-btn{
+    border:1px solid #ddd6fe;
+    background:#fff;
+    color:#475569;
+
+    border-radius:8px;
+    padding:7px 4px;
+
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.time-btn.selected{
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #9333ea
+    );
+
+    color:#fff;
+    border-color:#7c3aed;
+}
+
+.time-btn.time-slot-blocked{
+    background:#e5e7eb !important;
+    color:#6b7280 !important;
+    border-color:#d1d5db !important;
+
+    cursor:not-allowed !important;
+    opacity:.9;
+    text-decoration:line-through;
+}
+
+.empty-times{
+    grid-column:1/-1;
+
+    padding:8px;
+    border-radius:7px;
+
+    background:#f8fafc;
+    color:#94a3b8;
+
+    text-align:center;
+    font-size:9px;
+}
+
+.follow-up-panel textarea{
+    width:100%;
+    box-sizing:border-box;
+
+    min-height:60px;
+    margin-top:8px;
+
+    border:1px solid #d8b4fe;
+    border-radius:8px;
+
+    padding:8px;
+    resize:vertical;
+}
+
+.follow-up-submit{
+    width:100%;
+
+    border:0;
+    border-radius:8px;
+
+    padding:8px 10px;
+    box-sizing:border-box;
+
+    font-weight:800;
+    font-size:11px;
+
+    cursor:pointer;
+    text-align:center;
+
+    background:linear-gradient(
+        135deg,
+        #8b5cf6,
+        #7c3aed
+    );
+
+    color:#fff;
+    margin-top:7px;
+}
+
+/* =========================================================
+   DATE SEARCH
+========================================================= */
+
+.doctor-date-search{
+    background:#fff;
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:14px;
+
+    padding:9px 10px;
+    margin:8px 0 10px;
+
+    box-shadow:0 4px 14px rgba(15,23,42,.04);
+}
+
+.doctor-date-search-title{
+    font-size:11px;
+    font-weight:900;
+    color:#334155;
+    text-align:right;
+    margin-bottom:6px;
+}
+
+.doctor-date-search-row{
+    display:grid;
+    grid-template-columns:minmax(150px,1fr) auto auto;
+    gap:6px;
+    align-items:center;
+}
+
+.doctor-date-search-row input{
+    width:100%;
+    min-width:0;
+
+    box-sizing:border-box;
+
+    border:1px solid #dbe4ea;
+    border-radius:9px;
+
+    padding:8px 9px;
+
+    background:#fff;
+    color:#334155;
+
+    font-size:11px;
+    font-weight:700;
+}
+
+.doctor-date-search-row button{
+    border:0;
+    border-radius:9px;
+
+    padding:8px 11px;
+
+    cursor:pointer;
+
+    font-size:10px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+#doctor-date-search-btn,
+#follow-date-search-btn{
+    background:#2563eb;
+    color:#fff;
+}
+
+#doctor-date-clear-btn,
+#follow-date-clear-btn{
+    background:#64748b;
+    color:#fff;
+}
+
+/* =========================================================
+   DAY SECTIONS
+========================================================= */
+
+.day-section{
+    margin-bottom:18px;
+}
+
+.day-section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+
+    margin-bottom:8px;
+    padding:12px 15px;
+
+    background:#fff;
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:14px;
+
+    box-shadow:0 5px 18px rgba(15,23,42,.045);
+}
+
+.day-section-title{
+    font-size:15px;
+    font-weight:900;
+    color:#0f172a;
+}
+
+.day-section-subtitle{
+    margin-top:2px;
+    font-size:11px;
+    color:#64748b;
+}
+
+.day-count{
+    padding:6px 9px;
+    border-radius:8px;
+
+    background:#eff6ff;
+    color:#1d4ed8;
+
+    font-size:10px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.day-empty{
+    padding:18px 15px;
+    margin-bottom:8px;
+
+    background:#fff;
+
+    border:1px dashed #cbd5e1;
+    border-radius:12px;
+
+    text-align:center;
+    color:#94a3b8;
+    font-size:12px;
+}
+
+/* =========================================================
+   TABLE SHELL / CARDS
+========================================================= */
+
+.table-shell{
+    background:rgba(255,255,255,.95);
+    border:1px solid rgba(148,163,184,.22);
+    border-radius:18px;
+
+    box-shadow:0 14px 38px rgba(15,23,42,.08);
+
+    overflow:hidden;
+}
+
+.table-title{
+    padding:14px 16px;
+
+    border-bottom:1px solid #eef2f7;
+
+    font-weight:900;
+    color:#0f172a;
+
+    background:linear-gradient(
+        135deg,
+        #fbffff,
+        #f2f8f8
+    );
+}
+
+.table-wrap{
+    overflow:visible;
+}
+
+.appointments-table{
+    display:block;
+
+    width:100%;
+    min-width:0 !important;
+
+    border-collapse:separate;
+    border-spacing:0;
+}
+
+.appointments-table thead{
+    display:none;
+}
+
+.appointments-table tbody{
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(300px,1fr));
+
+    gap:14px;
+
+    padding:14px;
+
+    width:100%;
+    box-sizing:border-box;
+}
+
+.appointments-table tbody > tr{
+    display:flex;
+    flex-direction:column;
+
+    width:100%;
+    min-width:0;
+
+    margin:0;
+    padding:0;
+
+    box-sizing:border-box;
+
+    background:#fff;
+
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+
+    overflow:hidden;
+
+    box-shadow:0 5px 18px rgba(15,23,42,.07);
+
+    transition:.2s ease;
+}
+
+.appointments-table tbody > tr:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(15,23,42,.09);
+}
+
+.appointments-table tbody > tr > td{
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+
+    width:100%;
+
+    min-height:44px;
+
+    padding:10px 13px;
+
+    box-sizing:border-box;
+
+    border:0;
+    border-bottom:1px solid #edf1f5;
+
+    text-align:right;
+
+    color:#334155;
+    font-size:12px;
+}
+
+.appointments-table tbody > tr > td:last-child{
+    border-bottom:0;
+}
+
+.appointments-table td::before{
+    color:#64748b;
+    font-size:10px;
+    font-weight:900;
+
+    flex:0 0 auto;
+}
+
+.appointments-table td:nth-child(1)::before{
+    content:"👤 المريض";
+}
+
+.appointments-table td:nth-child(2)::before{
+    content:"📅 التاريخ";
+}
+
+.appointments-table td:nth-child(3)::before{
+    content:"🕐 الساعة";
+}
+
+.appointments-table td:nth-child(4)::before{
+    content:"📌 الحالة";
+}
+
+.appointments-table td:nth-child(5)::before{
+    content:"👤 الحضور";
+}
+
+.appointments-table td:nth-child(6)::before{
+    content:"⚙️ الإجراءات";
+}
+
+.follow-up-appointments-table td:nth-child(5)::before{
+    content:"⚙️ الإجراءات";
+}
+
+.patient-cell{
+    font-weight:900;
+    color:#0f172a;
+}
+
+.follow-label{
+    display:inline-block;
+
+    margin-top:5px;
+
+    font-size:10px;
+    font-weight:800;
+
+    color:#7c3aed;
+    background:#f5f3ff;
+
+    padding:4px 7px;
+    border-radius:7px;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status{
+    display:inline-block;
+
+    padding:7px 9px;
+    border-radius:8px;
+
+    text-align:center;
+
+    font-size:11px;
+    font-weight:800;
+
+    white-space:nowrap;
+
+    border:1px solid rgba(148,163,184,.10);
+}
+
+.status-pending{
+    background:#fff7ed;
+    color:#c2410c;
+}
+
+.status-accepted{
+    background:#ecfdf5;
+    color:#047857;
+}
+
+.status-waiting{
+    background:#fff7ed;
+    color:#c2410c;
+}
+
+.status-attended{
+    background:#ecfdf5;
+    color:#047857;
+}
+
+.status-absent{
+    background:#f1f5f9;
+    color:#475569;
+}
+
+.status-rejected{
+    background:#fef2f2;
+    color:#b91c1c;
+}
+
+.status-cancelled{
+    background:#f1f5f9;
+    color:#475569;
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.actions-cell{
+    min-width:190px;
+}
+
+.actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+
+    width:100%;
+}
+
+.actions > *,
+.actions form,
+.actions a,
+.actions button{
+    width:100%;
+    box-sizing:border-box;
+}
+
+.action-button,
+.chat-button,
+.attendance-button,
+.follow-up-button{
+    width:100%;
+
+    border:0;
+    border-radius:8px;
+
+    padding:8px 10px;
+
+    box-sizing:border-box;
+
+    font-weight:800;
+    font-size:11px;
+
+    cursor:pointer;
+    text-align:center;
+    text-decoration:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    min-height:40px;
+}
+
+.chat-button{
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color:#fff;
+
+    box-shadow:0 7px 15px rgba(37,99,235,.16);
+}
+
+.attended-button{
+    background:linear-gradient(
+        135deg,
+        #16a34a,
+        #15803d
+    );
+    color:#fff;
+}
+
+.absent-button{
+    background:linear-gradient(
+        135deg,
+        #64748b,
+        #475569
+    );
+    color:#fff;
+}
+
+.accept-button,
+.attended-button{
+    box-shadow:0 7px 15px rgba(16,185,129,.12);
+}
+
+.reject-button,
+.absent-button{
+    box-shadow:0 7px 15px rgba(15,23,42,.10);
+}
+
+.follow-up-button{
+    background:linear-gradient(
+        135deg,
+        #8b5cf6,
+        #7c3aed
+    );
+
+    color:#fff;
+
+    box-shadow:0 7px 15px rgba(124,58,237,.16);
+}
+
+.attendance-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:6px;
+
+    width:100%;
+}
+
+.attendance-disabled-note{
+    display:block;
+
+    margin-top:4px;
+
+    font-size:11px;
+    line-height:1.35;
+
+    color:#8a5a00;
+
+    text-align:center;
+    opacity:.9;
+}
+
+/* =========================================================
+   FILTER VISIBILITY
+========================================================= */
+
+.js-filter-hidden{
+    display:none !important;
+}
+
+.appointment-hidden{
+    display:none !important;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:900px){
+
+    .doctor-appointments-page{
+        padding:16px 10px 40px;
+    }
+
+    .new-booking-row{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .new-booking-actions{
+        width:100%;
+    }
+
+    .new-booking-actions form{
+        flex:1;
+    }
+
+    .quick-accept,
+    .quick-reject{
+        width:100%;
+    }
+
+}
+
+@media(max-width:700px){
+
+    .doctor-fixed-controls{
+        position:relative;
+        top:auto;
+        border-radius:16px;
+        padding:6px;
+    }
+
+    .next-appointment-card,
+    .next-follow-up-grid{
+        grid-template-columns:1fr;
+    }
+
+    .appointments-table tbody{
+        grid-template-columns:1fr;
+        padding:10px;
+        gap:10px;
+    }
+
+    .appointments-table tbody > tr > td{
+        min-height:42px;
+        padding:9px 11px;
+    }
+
+    .doctor-date-search-row{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .doctor-date-search-row input{
+        grid-column:1/-1;
+    }
+
+    .doctor-date-search-row button{
+        min-height:36px;
+    }
+
+    .follow-up-time-list{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="doctor-appointments-page">
+
+    <div class="page-header">
+        <h1>📅 حجوزات المرضى</h1>
+        <p>متابعة المواعيد، الحضور، إعادة الكشف والتقييم.</p>
+    </div>
+
+    {% if messages %}
+        <div id="doctor-action-messages" class="django-messages">
+            {% for message in messages %}
+                <div class="django-message {% if 'error' in message.tags %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if request.GET.tab != 'followup' %}
+        <section class="new-bookings-panel">
+            <div class="new-bookings-head">
+                <div>
+                    <div class="new-bookings-title">🔔 طلبات الحجز الجديدة</div>
+                    <div class="new-bookings-subtitle">الحجوزات التي تحتاج إلى قبول أو رفض</div>
+                </div>
+                <span class="new-bookings-count">{{ pending_count }}</span>
+            </div>
+
+            <div class="new-bookings-list">
+                {% for appointment in appointments %}
+                    {% if appointment.status == 'PENDING' and not appointment.is_follow_up %}
+                        <div class="new-booking-row">
+                            <div class="new-booking-info">
+                                <strong>{{ appointment.patient.get_full_name|default:appointment.patient.username }}</strong>
+                                <span>
+                                    {{ appointment.date|date:'Y-m-d' }} — {{ appointment.time|time:'h:i A' }}
+                                </span>
+                            </div>
+
+                            <div class="new-booking-actions">
+                                <form method="POST" action="{% url 'update_appointment_status' appointment.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="ACCEPTED">
+                                    <button type="submit" class="quick-accept">✅ قبول</button>
+                                </form>
+
+                                <form method="POST" action="{% url 'update_appointment_status' appointment.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="REJECTED">
+                                    <button type="submit" class="quick-reject">❌ رفض</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <div class="new-booking-row">لا توجد طلبات حجز جديدة حاليًا.</div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <div class="doctor-fixed-controls">
+
+        <div class="appointment-tabs">
+            <a href="{% url 'doctor_appointments' %}"
+               class="doctor-tab {% if request.GET.tab != 'followup' %}active{% endif %}">
+                📅 الحجوزات
+            </a>
+
+            <a href="{% url 'doctor_appointments' %}?tab=followup"
+               class="doctor-tab follow {% if request.GET.tab == 'followup' %}active{% endif %}">
+                🔄 إعادة الكشف
+            </a>
+        </div>
+
+        {% if request.GET.tab != 'followup' %}
+
+            <div class="doctor-period-tabs">
+                <button type="button" class="doctor-period-tab active" data-period="active">
+                    ✅ المواعيد السارية
+                </button>
+
+                <button type="button" class="doctor-period-tab past" data-period="past">
+                    🕘 المواعيد الفائتة
+                </button>
+            </div>
+
+            <section class="next-appointment-panel">
+                <div class="next-appointment-title">📌 الموعد القادم</div>
+
+                {% if next_appointment %}
+                    <div class="next-appointment-card">
+
+                        <div class="next-appointment-item">
+                            <span class="next-appointment-label">👤 المريض</span>
+                            <span class="next-appointment-value">
+                                {{ next_appointment.patient.get_full_name|default:next_appointment.patient.username }}
+                            </span>
+                        </div>
+
+                        <div class="next-appointment-item">
+                            <span class="next-appointment-label">📅 الموعد</span>
+                            <span class="next-appointment-value">
+                                {{ next_appointment.date|date:'Y-m-d' }} — {{ next_appointment.time|time:'h:i A' }}
+                            </span>
+                        </div>
+
+                        <div class="next-appointment-item">
+                            <span class="next-appointment-label">📝 التفاصيل</span>
+                            <span class="next-appointment-value">
+                                {% if next_appointment.notes %}
+                                    {{ next_appointment.notes }}
+                                {% else %}
+                                    كشف عادي
+                                {% endif %}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="next-appointment-status">✅ الموعد القادم المؤكد</div>
+
+                    <a href="{% url 'doctor_chat' next_appointment.patient.id %}"
+                       class="chat-button next-appointment-chat">
+                        💬 التحدث مع المريض
+                    </a>
+                {% else %}
+                    <div class="day-empty">لا يوجد موعد قادم مؤكد حاليًا.</div>
+                {% endif %}
+            </section>
+
+            <section class="schedule-day-selector">
+                <div class="schedule-day-selector-title">📅 اختر اليوم لعرض مواعيد هذا اليوم</div>
+
+                <div class="schedule-day-strip">
+                    {% for day in week_days %}
+                        <button type="button"
+                                class="schedule-day-btn doctor-filter-day"
+                                data-schedule-date="{{ day.date|date:'Y-m-d' }}">
+                            <strong>{{ day.weekday_name }}</strong>
+                            <span>{{ day.date|date:'Y-m-d' }}</span>
+                        </button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="doctor-date-search">
+                <div class="doctor-date-search-title">🔎 بحث بالتاريخ</div>
+
+                <div class="doctor-date-search-row">
+                    <input type="date" id="doctor-date-search" aria-label="بحث بالمواعيد حسب التاريخ">
+                    <button type="button" id="doctor-date-search-btn">🔎 بحث بالتاريخ</button>
+                    <button type="button" id="doctor-date-clear-btn">مسح</button>
+                </div>
+            </section>
+
+        {% else %}
+
+            <section class="next-follow-up-panel">
+                <div class="next-follow-up-title">🔄 إعادة الكشف القادمة</div>
+
+                {% if next_follow_up_appointment %}
+                    <div class="next-follow-up-grid">
+
+                        <div class="next-follow-up-item">
+                            <span class="next-follow-up-label">👤 المريض</span>
+                            <span class="next-follow-up-value">
+                                {{ next_follow_up_appointment.patient.get_full_name|default:next_follow_up_appointment.patient.username }}
+                            </span>
+                        </div>
+
+                        <div class="next-follow-up-item">
+                            <span class="next-follow-up-label">📅 الموعد</span>
+                            <span class="next-follow-up-value">
+                                {{ next_follow_up_appointment.date|date:'Y-m-d' }} —
+                                {{ next_follow_up_appointment.time|time:'h:i A' }}
+                            </span>
+                        </div>
+
+                        <div class="next-follow-up-item">
+                            <span class="next-follow-up-label">📝 التفاصيل</span>
+                            <span class="next-follow-up-value">
+                                {% if next_follow_up_appointment.notes %}
+                                    {{ next_follow_up_appointment.notes }}
+                                {% else %}
+                                    إعادة كشف
+                                {% endif %}
+                            </span>
+                        </div>
+
+                    </div>
+                {% else %}
+                    <div class="day-empty">لا توجد إعادة كشف قادمة حاليًا.</div>
+                {% endif %}
+            </section>
+
+            <section class="schedule-day-selector">
+                <div class="schedule-day-selector-title">🔄 اختر اليوم لعرض مواعيد إعادة الكشف</div>
+
+                <div class="schedule-day-strip">
+                    {% for follow_day in follow_up_days %}
+                        <button type="button"
+                                class="schedule-day-btn follow-up-filter-btn"
+                                data-followup-date="{{ follow_day.date|date:'Y-m-d' }}">
+                            <strong>{{ follow_day.weekday_name }}</strong>
+                            <span>{{ follow_day.date|date:'Y-m-d' }}</span>
+                        </button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <div class="follow-period-tabs">
+                <button type="button" class="follow-period-tab active" data-period="active">
+                    ✅ المواعيد السارية
+                </button>
+
+                <button type="button" class="follow-period-tab past" data-period="past">
+                    🕘 المواعيد الفائتة
+                </button>
+            </div>
+
+            <section class="doctor-date-search">
+                <div class="doctor-date-search-title">🔎 بحث بالتاريخ</div>
+
+                <div class="doctor-date-search-row">
+                    <input type="date" id="follow-date-search" aria-label="بحث بإعادة الكشف حسب التاريخ">
+                    <button type="button" id="follow-date-search-btn">🔎 بحث بالتاريخ</button>
+                    <button type="button" id="follow-date-clear-btn">مسح</button>
+                </div>
+            </section>
+
+        {% endif %}
+
+    </div>
+
+    {% if request.GET.tab != 'followup' %}
+
+        {% for day in week_days %}
+
+            <section class="day-section doctor-day-section"
+                     data-schedule-date="{{ day.date|date:'Y-m-d' }}">
+
+                <div class="day-section-head">
+                    <div>
+                        <div class="day-section-title">📅 {{ day.date|date:'Y-m-d' }}</div>
+                        <div class="day-section-subtitle">{{ day.date|date:'l' }}</div>
+                    </div>
+
+                    <span class="day-count">{{ day.appointments|length }} موعد</span>
+                </div>
+
+                {% if day.appointments %}
+
+                    <div class="table-shell">
+                        <div class="table-wrap">
+
+                            <table class="appointments-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>المريض</th>
+                                        <th>التاريخ</th>
+                                        <th>الساعة</th>
+                                        <th>الحالة</th>
+                                        <th>الحضور</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                {% for appointment in day.appointments %}
+
+                                    {% if not appointment.is_follow_up %}
+
+                                        <tr
+                                            class="{% if appointment.date > today or appointment.date == today and appointment.time > now.time %}active-appointment-row{% else %}past-appointment-row{% endif %}"
+                                            data-appointment-id="{{ appointment.id }}"
+                                            data-date="{{ appointment.date|date:'Y-m-d' }}"
+                                            data-appointment-date="{{ appointment.date|date:'Y-m-d' }}"
+                                            data-appointment-time="{{ appointment.time|time:'H:i:s' }}"
+                                        >
+
+                                            <td class="patient-cell">
+                                                {{ appointment.patient.get_full_name|default:appointment.patient.username }}
+                                            </td>
+
+                                            <td>{{ appointment.date|date:'Y-m-d' }}</td>
+
+                                            <td>{{ appointment.time|time:'h:i A' }}</td>
+
+                                            <td>
+                                                {% if appointment.status == 'PENDING' %}
+                                                    <span class="status status-pending">⏳ قيد الانتظار</span>
+                                                {% elif appointment.status == 'ACCEPTED' %}
+                                                    <span class="status status-accepted">✅ مقبول</span>
+                                                {% elif appointment.status == 'REJECTED' %}
+                                                    <span class="status status-rejected">❌ مرفوض</span>
+                                                {% elif appointment.status == 'CANCELLED' %}
+                                                    <span class="status status-cancelled">🚫 ملغي</span>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+
+                                                {% if appointment.status == 'PENDING' %}
+
+                                                    <span class="status status-pending">—</span>
+
+                                                {% elif appointment.status == 'ACCEPTED' %}
+
+                                                    {% if appointment.attendance == 'ATTENDED' %}
+
+                                                        <span class="status status-attended">✅ حضر</span>
+
+                                                    {% elif appointment.attendance == 'ABSENT' %}
+
+                                                        <span class="status status-absent">❌ لم يحضر</span>
+
+                                                    {% else %}
+
+                                                        <!--
+                                                            أزرار الحضور لا تظهر إلا عند وصول
+                                                            تاريخ ووقت الحجز فعليًا.
+                                                        -->
+                                                        {% if appointment.can_mark_attendance %}
+
+                                                            <div class="attendance-actions">
+
+                                                                <form method="POST"
+                                                                      action="{% url 'mark_attendance' appointment.id %}">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="attendance" value="ATTENDED">
+
+                                                                    <button
+                                                                        class="attendance-button attended-button"
+                                                                        type="submit">
+                                                                        ✅ حضر
+                                                                    </button>
+                                                                </form>
+
+                                                                <form method="POST"
+                                                                      action="{% url 'mark_attendance' appointment.id %}">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="attendance" value="ABSENT">
+
+                                                                    <button
+                                                                        class="attendance-button absent-button"
+                                                                        type="submit">
+                                                                        ❌ لم يحضر
+                                                                    </button>
+                                                                </form>
+
+                                                            </div>
+
+                                                        {% else %}
+
+                                                            <div class="attendance-actions attendance-before-time">
+                                                                <span class="attendance-disabled-note">
+                                                                    سيتم فتح تسجيل الحضور عند موعد الحجز
+                                                                </span>
+                                                            </div>
+
+                                                        {% endif %}
+
+                                                    {% endif %}
+
+                                                {% else %}
+
+                                                    <span class="status status-cancelled">—</span>
+
+                                                {% endif %}
+
+                                            </td>
+
+                                            <td class="actions-cell">
+
+                                                <div class="actions">
+
+                                                    <a href="{% url 'doctor_chat' appointment.patient.id %}"
+                                                       class="chat-button">
+                                                        💬 تحدث مع المريض
+                                                    </a>
+
+                                                    {% if appointment.status == 'ACCEPTED' and appointment.attendance == 'ATTENDED' %}
+                                                        <button
+                                                            type="button"
+                                                            class="follow-up-button"
+                                                            data-followup-id="{{ appointment.id }}"
+                                                            data-followup-url="{% url 'create_follow_up' appointment.id %}">
+                                                            🔄 إعادة كشف
+                                                        </button>
+                                                    {% endif %}
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+
+                {% else %}
+
+                    <div class="day-empty">لا توجد مواعيد في هذا اليوم.</div>
+
+                {% endif %}
+
+            </section>
+
+        {% endfor %}
+
+        <div id="doctor-active-empty" class="day-empty appointment-hidden">
+            لا توجد مواعيد سارية في العرض الحالي.
+        </div>
+
+        <div id="doctor-past-empty" class="day-empty appointment-hidden">
+            لا توجد مواعيد فائتة في العرض الحالي.
+        </div>
+
+        <section id="follow-up-panel" class="follow-up-panel">
+
+            <div class="follow-up-panel-head">
+
+                <div>
+                    <div class="follow-up-panel-title">🔄 تحديد موعد إعادة الكشف</div>
+
+                    <div id="follow-up-panel-subtitle" class="follow-up-panel-subtitle">
+                        اضغط على إعادة كشف من الحجز أولًا.
+                    </div>
+                </div>
+
+                <button type="button" id="follow-up-close" class="follow-up-close">×</button>
+
+            </div>
+
+            <form id="follow-up-form" method="POST" action="">
+
+                {% csrf_token %}
+
+                <div class="picker-label">📅 اختر اليوم</div>
+
+                <div class="follow-up-day-strip">
+                    <div class="follow-up-day-track">
+
+                        {% for follow_day in follow_up_days %}
+
+                            <button type="button"
+                                    class="follow-up-day-btn"
+                                    data-date="{{ follow_day.date|date:'Y-m-d' }}"
+                                    data-day-name="{{ follow_day.weekday_name }}"
+                                    data-day-date="{{ follow_day.date|date:'m-d' }}">
+
+                                <strong>{{ follow_day.weekday_name }}</strong>
+                                <span>{{ follow_day.date|date:'m-d' }}</span>
+
+                            </button>
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+                <div id="follow-up-selected-day" class="follow-up-selected-day">
+                    اختر اليوم أولًا
+                </div>
+
+                <div class="picker-label">🕐 اختر الساعة</div>
+
+                <div id="follow-up-time-list" class="follow-up-time-list">
+                    <div class="empty-times">اختر اليوم أولًا</div>
+                </div>
+
+                <input type="hidden" name="date" id="follow-up-date" required>
+                <input type="hidden" name="time" id="follow-up-time" required>
+
+                <textarea name="notes" placeholder="تفاصيل إعادة الكشف..."></textarea>
+
+                <button type="submit" class="follow-up-submit">
+                    ✅ تأكيد إعادة الكشف
+                </button>
+
+            </form>
+
+        </section>
+
+    {% else %}
+
+        <div class="table-shell">
+
+            <div class="table-title">🔄 مواعيد إعادة الكشف</div>
+
+            <div class="table-wrap">
+
+                <table class="appointments-table follow-up-appointments-table">
+
+                    <thead>
+                        <tr>
+                            <th>المريض</th>
+                            <th>التاريخ</th>
+                            <th>الساعة</th>
+                            <th>الحالة</th>
+                            <th>الحضور</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for appointment in follow_up_appointments %}
+
+                        <tr
+                            class="follow-up-row {% if appointment.is_past_datetime %}past-follow-row{% else %}active-follow-row{% endif %}"
+                            data-appointment-id="{{ appointment.id }}"
+                            data-followup-date="{{ appointment.date|date:'Y-m-d' }}"
+                            data-date="{{ appointment.date|date:'Y-m-d' }}"
+                            data-appointment-date="{{ appointment.date|date:'Y-m-d' }}"
+                            data-appointment-time="{{ appointment.time|time:'H:i:s' }}"
+                        >
+
+                            <td class="patient-cell">
+
+                                {{ appointment.patient.get_full_name|default:appointment.patient.username }}
+
+                                <span class="follow-label">🔄 إعادة كشف</span>
+
+                            </td>
+
+                            <td>{{ appointment.date|date:'Y-m-d' }}</td>
+
+                            <td>{{ appointment.time|time:'h:i A' }}</td>
+
+                            <td>
+
+                                {% if appointment.status == 'PENDING' %}
+
+                                    <span class="status status-pending">
+                                        ⏳ قيد الانتظار
+                                    </span>
+
+                                {% elif appointment.status == 'ACCEPTED' %}
+
+                                    <span class="status status-accepted">
+                                        ✅ مؤكد
+                                    </span>
+
+                                {% elif appointment.status == 'REJECTED' %}
+
+                                    <span class="status status-rejected">
+                                        ❌ مرفوض
+                                    </span>
+
+                                {% elif appointment.status == 'CANCELLED' %}
+
+                                    <span class="status status-cancelled">
+                                        🚫 ملغي
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <!--
+                                حضور إعادة الكشف:
+                                لا تظهر أزرار حضر/لم يحضر إلا بعد وصول
+                                تاريخ ووقت إعادة الكشف فعليًا.
+                            -->
+
+                            <td>
+
+                                {% if appointment.status == 'ACCEPTED' %}
+
+                                    {% if appointment.attendance == 'ATTENDED' %}
+
+                                        <span class="status status-attended">
+                                            ✅ حضر
+                                        </span>
+
+                                    {% elif appointment.attendance == 'ABSENT' %}
+
+                                        <span class="status status-absent">
+                                            ❌ لم يحضر
+                                        </span>
+
+                                    {% else %}
+
+                                        {% if appointment.can_mark_attendance %}
+
+                                            <div class="attendance-actions">
+
+                                                <form method="POST"
+                                                      action="{% url 'mark_attendance' appointment.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="attendance" value="ATTENDED">
+
+                                                    <button
+                                                        class="attendance-button attended-button"
+                                                        type="submit">
+                                                        ✅ حضر
+                                                    </button>
+                                                </form>
+
+                                                <form method="POST"
+                                                      action="{% url 'mark_attendance' appointment.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="attendance" value="ABSENT">
+
+                                                    <button
+                                                        class="attendance-button absent-button"
+                                                        type="submit">
+                                                        ❌ لم يحضر
+                                                    </button>
+                                                </form>
+
+                                            </div>
+
+                                        {% else %}
+
+                                            <div class="attendance-actions attendance-before-time">
+                                                <span class="attendance-disabled-note">
+                                                    سيتم فتح تسجيل الحضور عند موعد إعادة الكشف
+                                                </span>
+                                            </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="status status-cancelled">—</span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="actions-cell">
+
+                                <div class="actions">
+
+                                    <a href="{% url 'doctor_chat' appointment.patient.id %}"
+                                       class="chat-button">
+                                        💬 تحدث مع المريض
+                                    </a>
+
+                                    <!--
+                                        إعادة الكشف مرة أخرى:
+                                        تظهر فقط إذا حضر المريض إعادة الكشف الحالية.
+                                    -->
+                                    {% if appointment.status == 'ACCEPTED' and appointment.attendance == 'ATTENDED' %}
+
+                                        <button
+                                            type="button"
+                                            class="follow-up-button follow-up-from-past"
+                                            data-followup-id="{{ appointment.id }}"
+                                            data-followup-url="{% url 'create_follow_up' appointment.id %}">
+                                            🔄 إعادة كشف مرة أخرى
+                                        </button>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-box">
+                                    لا توجد مواعيد إعادة كشف حتى الآن.
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- نموذج إعادة الكشف مرة أخرى من صفحة إعادة الكشف -->
+        <section id="follow-up-panel" class="follow-up-panel">
+
+            <div class="follow-up-panel-head">
+
+                <div>
+                    <div class="follow-up-panel-title">🔄 تحديد موعد إعادة الكشف</div>
+
+                    <div id="follow-up-panel-subtitle" class="follow-up-panel-subtitle">
+                        اضغط على إعادة كشف مرة أخرى بعد حضور المريض.
+                    </div>
+                </div>
+
+                <button type="button" id="follow-up-close" class="follow-up-close">×</button>
+
+            </div>
+
+            <form id="follow-up-form" method="POST" action="">
+
+                {% csrf_token %}
+
+                <div class="picker-label">📅 اختر اليوم</div>
+
+                <div class="follow-up-day-strip">
+                    <div class="follow-up-day-track">
+
+                        {% for follow_day in follow_up_days %}
+
+                            <button type="button"
+                                    class="follow-up-day-btn"
+                                    data-date="{{ follow_day.date|date:'Y-m-d' }}"
+                                    data-day-name="{{ follow_day.weekday_name }}"
+                                    data-day-date="{{ follow_day.date|date:'m-d' }}">
+
+                                <strong>{{ follow_day.weekday_name }}</strong>
+                                <span>{{ follow_day.date|date:'m-d' }}</span>
+
+                            </button>
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+                <div id="follow-up-selected-day" class="follow-up-selected-day">
+                    اختر اليوم أولًا
+                </div>
+
+                <div class="picker-label">🕐 اختر الساعة</div>
+
+                <div id="follow-up-time-list" class="follow-up-time-list">
+                    <div class="empty-times">اختر اليوم أولًا</div>
+                </div>
+
+                <input type="hidden" name="date" id="follow-up-date" required>
+                <input type="hidden" name="time" id="follow-up-time" required>
+
+                <textarea name="notes" placeholder="تفاصيل إعادة الكشف..."></textarea>
+
+                <button type="submit" class="follow-up-submit">
+                    ✅ تأكيد إعادة الكشف
+                </button>
+
+            </form>
+
+        </section>
+
+    {% endif %}
+
+</div>
+
+
+{{ follow_up_days|json_script:'follow-up-days-data' }}
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
+    function pad(value){
+        return String(value).padStart(2,"0");
+    }
+
+    function localDateTime(dateValue,timeValue){
+
+        if(!dateValue || !timeValue){
+            return null;
+        }
+
+        const dateParts =
+            String(dateValue).split("-").map(Number);
+
+        const timeParts =
+            String(timeValue).split(":").map(Number);
+
+        if(
+            dateParts.length < 3 ||
+            timeParts.length < 2 ||
+            dateParts.some(Number.isNaN) ||
+            timeParts.slice(0,2).some(Number.isNaN)
+        ){
+            return null;
+        }
+
+        return new Date(
+            dateParts[0],
+            dateParts[1] - 1,
+            dateParts[2],
+            timeParts[0],
+            timeParts[1],
+            timeParts[2] || 0,
+            0
+        );
+    }
+
+    /*
+        مهم:
+        أزرار حضر/لم يحضر في أي مكان لا تظهر إلا إذا
+        الوقت الحالي >= وقت الحجز نفسه.
+    */
+    function isAppointmentTimeReached(row){
+
+        if(!row){
+            return false;
+        }
+
+        const appointmentDate =
+            row.dataset.appointmentDate ||
+            row.dataset.date;
+
+        const appointmentTime =
+            row.dataset.appointmentTime;
+
+        const appointmentDateTime =
+            localDateTime(
+                appointmentDate,
+                appointmentTime
+            );
+
+        if(!appointmentDateTime){
+            return false;
+        }
+
+        return new Date() >= appointmentDateTime;
+    }
+
+
+    function enableDueAttendanceButtons(){
+
+        document
+            .querySelectorAll(
+                "tr[data-appointment-date][data-appointment-time]"
+            )
+            .forEach(function(row){
+
+                const attendanceBox =
+                    row.querySelector(
+                        ".attendance-before-time"
+                    );
+
+                if(!attendanceBox){
+                    return;
+                }
+
+                if(!isAppointmentTimeReached(row)){
+                    return;
+                }
+
+                const appointmentId =
+                    row.dataset.appointmentId;
+
+                if(!appointmentId){
+                    return;
+                }
+
+                attendanceBox.innerHTML = `
+                    <div class="attendance-actions">
+
+                        <form method="POST"
+                              action="/mark-attendance/${appointmentId}/">
+                            <input type="hidden"
+                                   name="csrfmiddlewaretoken"
+                                   value="${getCsrfToken()}">
+
+                            <input type="hidden"
+                                   name="attendance"
+                                   value="ATTENDED">
+
+                            <button
+                                class="attendance-button attended-button"
+                                type="submit">
+                                ✅ حضر
+                            </button>
+                        </form>
+
+                        <form method="POST"
+                              action="/mark-attendance/${appointmentId}/">
+                            <input type="hidden"
+                                   name="csrfmiddlewaretoken"
+                                   value="${getCsrfToken()}">
+
+                            <input type="hidden"
+                                   name="attendance"
+                                   value="ABSENT">
+
+                            <button
+                                class="attendance-button absent-button"
+                                type="submit">
+                                ❌ لم يحضر
+                            </button>
+                        </form>
+
+                    </div>
+                `;
+
+            });
+
+    }
+
+
+    function getCsrfToken(){
+
+        const input =
+            document.querySelector(
+                "input[name='csrfmiddlewaretoken']"
+            );
+
+        return input
+            ? input.value
+            : "";
+    }
+
+
+    /*
+        بدل إنشاء رابط يدوي من JavaScript، نخزن رابط Django
+        داخل row وقت الرندر. لذلك هذه الدالة تُستخدم فقط
+        للـ refresh، بينما النماذج الأساسية موجودة في HTML.
+    */
+
+
+    /* =====================================================
+       SCROLL STATE
+    ===================================================== */
+
+    const DOCTOR_VIEW_STATE_KEY =
+        "doctorAppointmentsViewState";
+
+    let selectedDate = null;
+    let selectedPeriod = "active";
+    let followPeriod = "active";
+    let followDate = null;
+
+
+    function saveDoctorViewState(){
+
+        try{
+
+            sessionStorage.setItem(
+                DOCTOR_VIEW_STATE_KEY,
+                JSON.stringify({
+                    tab: "{{ request.GET.tab|default:''|escapejs }}",
+
+                    selectedDate:selectedDate,
+
+                    selectedPeriod:selectedPeriod,
+
+                    followDate:followDate,
+
+                    followPeriod:followPeriod,
+
+                    scrollY:
+                        window.scrollY ||
+                        window.pageYOffset ||
+                        0,
+
+                    targetAppointmentId:
+                        window.__doctorTargetAppointmentId || null,
+
+                    targetOffset:
+                        window.__doctorTargetAppointmentOffset !== undefined
+                            ? window.__doctorTargetAppointmentOffset
+                            : null
+                })
+            );
+
+        }catch(error){}
+
+    }
+
+
+    document
+        .querySelectorAll("form[method='POST']")
+        .forEach(function(form){
+
+            form.addEventListener(
+                "submit",
+                function(){
+
+                    /*
+                       لو الإجراء اتعمل من داخل حجز معين، نحفظ الحجز نفسه
+                       ومكانه بالنسبة للشاشة، وليس الـ scroll فقط.
+                       بذلك بعد الـ POST والـ reload نرجع لنفس الحجز ونفس
+                       المكان حتى لو اتغير ارتفاع الكارت بعد تسجيل الحضور.
+                    */
+                    const row = form.closest("tr[data-appointment-id]");
+
+                    if(row){
+
+                        window.__doctorTargetAppointmentId =
+                            row.dataset.appointmentId || null;
+
+                        window.__doctorTargetAppointmentOffset =
+                            row.getBoundingClientRect().top;
+
+                    }else{
+
+                        window.__doctorTargetAppointmentId = null;
+                        window.__doctorTargetAppointmentOffset = null;
+
+                    }
+
+                    saveDoctorViewState();
+
+                }
+            );
+
+        });
+
+
+    /* =====================================================
+       NORMAL APPOINTMENTS FILTER
+    ===================================================== */
+
+    const periodButtons =
+        Array.from(
+            document.querySelectorAll(
+                ".doctor-period-tab"
+            )
+        );
+
+    const dayButtons =
+        Array.from(
+            document.querySelectorAll(
+                ".doctor-filter-day"
+            )
+        );
+
+    const daySections =
+        Array.from(
+            document.querySelectorAll(
+                ".doctor-day-section"
+            )
+        );
+
+    const activeEmpty =
+        document.getElementById(
+            "doctor-active-empty"
+        );
+
+    const pastEmpty =
+        document.getElementById(
+            "doctor-past-empty"
+        );
+
+
+    function updateDaySections(){
+
+        let visibleRows = 0;
+
+        daySections.forEach(function(section){
+
+            const rows =
+                Array.from(
+                    section.querySelectorAll(
+                        "tbody tr.active-appointment-row, tbody tr.past-appointment-row"
+                    )
+                );
+
+            let sectionVisible = 0;
+
+            rows.forEach(function(row){
+
+                const rowPeriod =
+                    row.classList.contains(
+                        "active-appointment-row"
+                    )
+                        ? "active"
+                        : "past";
+
+                const periodMatch =
+                    rowPeriod === selectedPeriod;
+
+                const dateMatch =
+                    !selectedDate ||
+                    row.dataset.date === selectedDate;
+
+                const visible =
+                    periodMatch &&
+                    dateMatch;
+
+                row.classList.toggle(
+                    "js-filter-hidden",
+                    !visible
+                );
+
+                if(visible){
+                    sectionVisible++;
+                    visibleRows++;
+                }
+
+            });
+
+            section.classList.toggle(
+                "js-filter-hidden",
+                sectionVisible === 0
+            );
+
+        });
+
+
+        if(activeEmpty){
+
+            activeEmpty.classList.toggle(
+                "appointment-hidden",
+                !(
+                    selectedPeriod === "active" &&
+                    visibleRows === 0
+                )
+            );
+
+        }
+
+
+        if(pastEmpty){
+
+            pastEmpty.classList.toggle(
+                "appointment-hidden",
+                !(
+                    selectedPeriod === "past" &&
+                    visibleRows === 0
+                )
+            );
+
+        }
+
+    }
+
+
+    function selectPeriod(period){
+
+        selectedPeriod = period;
+
+        periodButtons.forEach(function(button){
+
+            button.classList.toggle(
+                "active",
+                button.dataset.period === period
+            );
+
+        });
+
+        updateDaySections();
+
+    }
+
+
+    periodButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                selectPeriod(
+                    button.dataset.period
+                );
+
+            }
+        );
+
+    });
+
+
+    /* =====================================================
+       NORMAL DAYS
+    ===================================================== */
+
+    dayButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                const date =
+                    button.dataset.scheduleDate;
+
+                if(selectedDate === date){
+
+                    selectedDate = null;
+
+                    dayButtons.forEach(function(item){
+                        item.classList.remove("active");
+                    });
+
+                }else{
+
+                    selectedDate = date;
+
+                    dayButtons.forEach(function(item){
+
+                        item.classList.toggle(
+                            "active",
+                            item.dataset.scheduleDate === date
+                        );
+
+                    });
+
+                }
+
+                updateDaySections();
+
+            }
+        );
+
+    });
+
+
+    /* =====================================================
+       TODAY
+    ===================================================== */
+
+    const currentDate =
+        new Date();
+
+    const today =
+        currentDate.getFullYear() +
+        "-" +
+        pad(currentDate.getMonth() + 1) +
+        "-" +
+        pad(currentDate.getDate());
+
+
+    const todayButton =
+        dayButtons.find(function(button){
+
+            return (
+                button.dataset.scheduleDate ===
+                today
+            );
+
+        });
+
+
+    if(todayButton){
+
+        selectedDate = today;
+
+        todayButton.classList.add("active");
+
+    }
+
+
+    selectPeriod("active");
+
+
+    /* =====================================================
+       NORMAL DATE SEARCH
+    ===================================================== */
+
+    const doctorDateSearch =
+        document.getElementById(
+            "doctor-date-search"
+        );
+
+    const doctorDateSearchBtn =
+        document.getElementById(
+            "doctor-date-search-btn"
+        );
+
+    const doctorDateClearBtn =
+        document.getElementById(
+            "doctor-date-clear-btn"
+        );
+
+
+    function applyDoctorDateSearch(dateValue){
+
+        if(!dateValue){
+
+            selectedDate = null;
+
+            dayButtons.forEach(function(button){
+                button.classList.remove("active");
+            });
+
+            selectPeriod("active");
+
+            return;
+        }
+
+
+        selectedDate = dateValue;
+
+
+        dayButtons.forEach(function(button){
+
+            button.classList.toggle(
+                "active",
+                button.dataset.scheduleDate === dateValue
+            );
+
+        });
+
+
+        const rowsForDate =
+            Array.from(
+                document.querySelectorAll(
+                    ".doctor-day-section tbody tr.active-appointment-row, .doctor-day-section tbody tr.past-appointment-row"
+                )
+            ).filter(function(row){
+
+                return row.dataset.date === dateValue;
+
+            });
+
+
+        const hasActive =
+            rowsForDate.some(function(row){
+                return row.classList.contains("active-appointment-row");
+            });
+
+
+        const hasPast =
+            rowsForDate.some(function(row){
+                return row.classList.contains("past-appointment-row");
+            });
+
+
+        if(hasActive && !hasPast){
+            selectPeriod("active");
+        }else if(hasPast && !hasActive){
+            selectPeriod("past");
+        }else if(dateValue < today){
+            selectPeriod("past");
+        }else{
+            selectPeriod("active");
+        }
+
+    }
+
+
+    if(
+        doctorDateSearchBtn &&
+        doctorDateSearch
+    ){
+
+        doctorDateSearchBtn.addEventListener(
+            "click",
+            function(){
+                applyDoctorDateSearch(
+                    doctorDateSearch.value
+                );
+            }
+        );
+
+
+        doctorDateSearch.addEventListener(
+            "change",
+            function(){
+                applyDoctorDateSearch(
+                    doctorDateSearch.value
+                );
+            }
+        );
+
+
+        doctorDateSearch.addEventListener(
+            "keydown",
+            function(event){
+
+                if(event.key === "Enter"){
+
+                    event.preventDefault();
+
+                    applyDoctorDateSearch(
+                        doctorDateSearch.value
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if(doctorDateClearBtn){
+
+        doctorDateClearBtn.addEventListener(
+            "click",
+            function(){
+
+                if(doctorDateSearch){
+                    doctorDateSearch.value = "";
+                }
+
+                selectedDate = null;
+
+                dayButtons.forEach(function(button){
+                    button.classList.remove("active");
+                });
+
+                selectPeriod("active");
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       FOLLOW-UP FILTER
+    ===================================================== */
+
+    const followDayButtons =
+        Array.from(
+            document.querySelectorAll(
+                ".follow-up-filter-btn"
+            )
+        );
+
+    const followRows =
+        Array.from(
+            document.querySelectorAll(
+                ".follow-up-row"
+            )
+        );
+
+    const followPeriodButtons =
+        Array.from(
+            document.querySelectorAll(
+                ".follow-period-tab"
+            )
+        );
+
+
+    function applyFollowFilters(){
+
+        followRows.forEach(function(row){
+
+            const rowPeriod =
+                row.classList.contains(
+                    "past-follow-row"
+                )
+                    ? "past"
+                    : "active";
+
+            const periodMatch =
+                rowPeriod === followPeriod;
+
+            const dateMatch =
+                !followDate ||
+                row.dataset.date === followDate;
+
+            row.classList.toggle(
+                "js-filter-hidden",
+                !(periodMatch && dateMatch)
+            );
+
+        });
+
+
+        followDayButtons.forEach(function(button){
+
+            button.classList.toggle(
+                "active",
+                !!followDate &&
+                button.dataset.followupDate === followDate
+            );
+
+        });
+
+    }
+
+
+    followPeriodButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                followPeriod =
+                    button.dataset.period;
+
+                followDate = null;
+
+                followPeriodButtons.forEach(function(item){
+
+                    item.classList.toggle(
+                        "active",
+                        item.dataset.period === followPeriod
+                    );
+
+                });
+
+                const followSearch =
+                    document.getElementById(
+                        "follow-date-search"
+                    );
+
+                if(followSearch){
+                    followSearch.value = "";
+                }
+
+                applyFollowFilters();
+
+            }
+        );
+
+    });
+
+
+    followDayButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(event){
+
+                event.preventDefault();
+
+                const date =
+                    button.dataset.followupDate;
+
+                followDate =
+                    followDate === date
+                        ? null
+                        : date;
+
+                const followSearch =
+                    document.getElementById(
+                        "follow-date-search"
+                    );
+
+                if(followSearch){
+                    followSearch.value =
+                        followDate || "";
+                }
+
+                applyFollowFilters();
+
+            }
+        );
+
+    });
+
+
+    const todayFollowButton =
+        followDayButtons.find(function(button){
+
+            return (
+                button.dataset.followupDate ===
+                today
+            );
+
+        });
+
+
+    if(todayFollowButton){
+
+        followDate = today;
+
+        todayFollowButton.classList.add("active");
+
+    }
+
+
+    applyFollowFilters();
+
+
+    /* =====================================================
+       FOLLOW-UP DATE SEARCH
+    ===================================================== */
+
+    const followDateSearch =
+        document.getElementById(
+            "follow-date-search"
+        );
+
+    const followDateSearchBtn =
+        document.getElementById(
+            "follow-date-search-btn"
+        );
+
+    const followDateClearBtn =
+        document.getElementById(
+            "follow-date-clear-btn"
+        );
+
+
+    function applyFollowDateSearch(){
+
+        followDate =
+            followDateSearch &&
+            followDateSearch.value
+                ? followDateSearch.value
+                : null;
+
+        applyFollowFilters();
+
+    }
+
+
+    if(
+        followDateSearchBtn &&
+        followDateSearch
+    ){
+
+        followDateSearchBtn.addEventListener(
+            "click",
+            applyFollowDateSearch
+        );
+
+
+        followDateSearch.addEventListener(
+            "change",
+            applyFollowDateSearch
+        );
+
+
+        followDateSearch.addEventListener(
+            "keydown",
+            function(event){
+
+                if(event.key === "Enter"){
+
+                    event.preventDefault();
+
+                    applyFollowDateSearch();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if(followDateClearBtn){
+
+        followDateClearBtn.addEventListener(
+            "click",
+            function(){
+
+                if(followDateSearch){
+                    followDateSearch.value = "";
+                }
+
+                followDate = null;
+
+                applyFollowFilters();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       FOLLOW-UP CREATE FORM
+    ===================================================== */
+
+    const panel =
+        document.getElementById(
+            "follow-up-panel"
+        );
+
+    const form =
+        document.getElementById(
+            "follow-up-form"
+        );
+
+    const subtitle =
+        document.getElementById(
+            "follow-up-panel-subtitle"
+        );
+
+    const closeBtn =
+        document.getElementById(
+            "follow-up-close"
+        );
+
+    const dateInput =
+        document.getElementById(
+            "follow-up-date"
+        );
+
+    const timeInput =
+        document.getElementById(
+            "follow-up-time"
+        );
+
+    const selectedDay =
+        document.getElementById(
+            "follow-up-selected-day"
+        );
+
+    const timeList =
+        document.getElementById(
+            "follow-up-time-list"
+        );
+
+    const dataScript =
+        document.getElementById(
+            "follow-up-days-data"
+        );
+
+
+    if(
+        panel &&
+        form &&
+        subtitle &&
+        closeBtn &&
+        dateInput &&
+        timeInput &&
+        selectedDay &&
+        timeList &&
+        dataScript
+    ){
+
+        let followDays = [];
+
+        try{
+
+            followDays =
+                JSON.parse(
+                    dataScript.textContent
+                );
+
+        }catch(error){
+
+            followDays = [];
+
+        }
+
+
+        document
+            .querySelectorAll(
+                ".follow-up-button[data-followup-url]"
+            )
+            .forEach(function(button){
+
+                button.addEventListener(
+                    "click",
+                    function(){
+
+                        const url =
+                            button.dataset.followupUrl;
+
+                        if(!url){
+
+                            alert(
+                                "رابط إعادة الكشف غير موجود."
+                            );
+
+                            return;
+
+                        }
+
+
+                        form.action = url;
+
+                        dateInput.value = "";
+                        timeInput.value = "";
+
+                        selectedDay.textContent =
+                            "اختر اليوم أولًا";
+
+                        timeList.innerHTML =
+                            '<div class="empty-times">اختر اليوم أولًا</div>';
+
+
+                        document
+                            .querySelectorAll(
+                                ".follow-up-day-btn"
+                            )
+                            .forEach(function(item){
+
+                                item.classList.remove(
+                                    "selected"
+                                );
+
+                            });
+
+
+                        const row =
+                            button.closest("tr");
+
+                        const patientCell =
+                            row
+                                ? row.querySelector(
+                                    ".patient-cell"
+                                )
+                                : null;
+
+                        const patientName =
+                            patientCell
+                                ? patientCell.textContent
+                                    .trim()
+                                    .replace(/\s+/g," ")
+                                : "المريض";
+
+
+                        subtitle.textContent =
+                            "اختار اليوم والساعة لإعادة كشف " +
+                            patientName +
+                            ".";
+
+
+                        panel.classList.add("open");
+
+
+                        panel.scrollIntoView({
+                            behavior:"smooth",
+                            block:"start"
+                        });
+
+                    }
+                );
+
+            });
+
+
+        closeBtn.addEventListener(
+            "click",
+            function(){
+
+                panel.classList.remove("open");
+
+                form.action = "";
+
+            }
+        );
+
+
+        document
+            .querySelectorAll(
+                ".follow-up-day-btn"
+            )
+            .forEach(function(button){
+
+                button.addEventListener(
+                    "click",
+                    function(){
+
+                        const date =
+                            button.dataset.date;
+
+
+                        const day =
+                            followDays.find(
+                                function(item){
+                                    return item.date === date;
+                                }
+                            );
+
+
+                        document
+                            .querySelectorAll(
+                                ".follow-up-day-btn"
+                            )
+                            .forEach(function(item){
+                                item.classList.remove("selected");
+                            });
+
+
+                        button.classList.add("selected");
+
+
+                        dateInput.value = date;
+                        timeInput.value = "";
+
+
+                        selectedDay.textContent =
+                            "📅 اليوم المختار: " +
+                            button.dataset.dayName +
+                            " — " +
+                            button.dataset.dayDate;
+
+
+                        if(
+                            !day ||
+                            !day.available
+                        ){
+
+                            timeList.innerHTML =
+                                '<div class="empty-times">الدكتور لا يعمل في هذا اليوم.</div>';
+
+                            return;
+
+                        }
+
+
+                        if(
+                            !day.slots ||
+                            !day.slots.length
+                        ){
+
+                            timeList.innerHTML =
+                                '<div class="empty-times">لا توجد ساعات متاحة في هذا اليوم.</div>';
+
+                            return;
+
+                        }
+
+
+                        timeList.innerHTML = "";
+
+
+                        day.slots.forEach(function(slot){
+
+                            const slotButton =
+                                document.createElement("button");
+
+                            slotButton.type = "button";
+                            slotButton.className = "time-btn";
+
+                            slotButton.textContent =
+                                "🕐 " +
+                                formatTime12(slot.label);
+
+
+                            if(!slot.available){
+
+                                slotButton.disabled = true;
+
+                                slotButton.classList.add(
+                                    "time-slot-blocked"
+                                );
+
+                                slotButton.textContent =
+                                    "🔒 " +
+                                    formatTime12(slot.label);
+
+                                slotButton.title =
+                                    (
+                                        slot.reason ||
+                                        "الموعد محجوز"
+                                    ) +
+                                    (
+                                        slot.patient_name
+                                            ? " — " + slot.patient_name
+                                            : ""
+                                    );
+
+                            }else{
+
+                                slotButton.addEventListener(
+                                    "click",
+                                    function(){
+
+                                        timeList
+                                            .querySelectorAll(
+                                                ".time-btn"
+                                            )
+                                            .forEach(function(item){
+                                                item.classList.remove("selected");
+                                            });
+
+
+                                        slotButton.classList.add("selected");
+
+                                        timeInput.value =
+                                            slot.value;
+
+                                    }
+                                );
+
+                            }
+
+
+                            timeList.appendChild(
+                                slotButton
+                            );
+
+                        });
+
+                    }
+                );
+
+            });
+
+
+        form.addEventListener(
+            "submit",
+            function(event){
+
+                if(!form.action){
+
+                    event.preventDefault();
+
+                    alert(
+                        "اضغط على إعادة كشف بجوار الحجز أولًا."
+                    );
+
+                    return;
+
+                }
+
+
+                if(!dateInput.value){
+
+                    event.preventDefault();
+
+                    alert(
+                        "من فضلك اختر اليوم."
+                    );
+
+                    return;
+
+                }
+
+
+                if(!timeInput.value){
+
+                    event.preventDefault();
+
+                    alert(
+                        "من فضلك اختر الساعة."
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       RESTORE FILTER STATE AFTER POST
+    ===================================================== */
+
+    function restoreDoctorViewState(){
+
+        try{
+
+            const raw =
+                sessionStorage.getItem(
+                    DOCTOR_VIEW_STATE_KEY
+                );
+
+            if(!raw){
+                return;
+            }
+
+
+            const state =
+                JSON.parse(raw);
+
+            sessionStorage.removeItem(
+                DOCTOR_VIEW_STATE_KEY
+            );
+
+
+            if(state.tab === "followup"){
+
+                if(state.followPeriod){
+
+                    followPeriod =
+                        state.followPeriod;
+
+                    followPeriodButtons.forEach(
+                        function(button){
+
+                            button.classList.toggle(
+                                "active",
+                                button.dataset.period === followPeriod
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                followDate =
+                    state.followDate || null;
+
+
+                if(
+                    followDateSearch &&
+                    followDate
+                ){
+
+                    followDateSearch.value =
+                        followDate;
+
+                }
+
+
+                applyFollowFilters();
+
+            }else{
+
+                selectedDate =
+                    state.selectedDate || null;
+
+
+                dayButtons.forEach(function(button){
+
+                    button.classList.toggle(
+                        "active",
+                        !!selectedDate &&
+                        button.dataset.scheduleDate === selectedDate
+                    );
+
+                });
+
+
+                selectPeriod(
+                    state.selectedPeriod ||
+                    "active"
+                );
+
+
+                if(
+                    doctorDateSearch &&
+                    selectedDate
+                ){
+
+                    doctorDateSearch.value =
+                        selectedDate;
+
+                }
+
+            }
+
+
+            requestAnimationFrame(function(){
+
+                requestAnimationFrame(function(){
+
+                    requestAnimationFrame(function(){
+
+                        let restored = false;
+
+                        if(state.targetAppointmentId){
+
+                            const targetRow =
+                                document.querySelector(
+                                    'tr[data-appointment-id="' +
+                                    CSS.escape(String(state.targetAppointmentId)) +
+                                    '"]'
+                                );
+
+                            if(targetRow){
+
+                                const offset =
+                                    state.targetOffset !== null &&
+                                    state.targetOffset !== undefined
+                                        ? Number(state.targetOffset)
+                                        : 0;
+
+                                const top =
+                                    window.pageYOffset +
+                                    targetRow.getBoundingClientRect().top -
+                                    offset;
+
+                                window.scrollTo({
+                                    top:Math.max(0, top),
+                                    left:0,
+                                    behavior:"auto"
+                                });
+
+                                restored = true;
+
+                            }
+
+                        }
+
+                        if(!restored){
+
+                            window.scrollTo({
+                                top:Number(
+                                    state.scrollY || 0
+                                ),
+                                left:0,
+                                behavior:"auto"
+                            });
+
+                        }
+
+                    });
+
+                });
+
+            });
+
+        }catch(error){}
+
+    }
+
+
+    restoreDoctorViewState();
+
+
+    /* =====================================================
+       TIME FORMAT
+    ===================================================== */
+
+    function formatTime12(value){
+
+        if(!value){
+            return "";
+        }
+
+
+        const parts =
+            String(value).split(":");
+
+
+        let hour =
+            parseInt(
+                parts[0],
+                10
+            );
+
+
+        const minute =
+            parts[1] || "00";
+
+
+        if(Number.isNaN(hour)){
+            return value;
+        }
+
+
+        const suffix =
+            hour >= 12
+                ? "PM"
+                : "AM";
+
+
+        hour =
+            hour % 12;
+
+
+        if(hour === 0){
+            hour = 12;
+        }
+
+
+        return (
+            String(hour).padStart(2,"0") +
+            ":" +
+            minute +
+            " " +
+            suffix
+        );
+
+    }
+
+
+    /* =====================================================
+       IMPORTANT:
+       ATTENDANCE BUTTONS ARE TIME-LOCKED
+       يعتمد ظهور الأزرار على appointment.can_mark_attendance
+       من Django، ويتم تحديث الصفحة عند وصول أقرب موعد.
+    ===================================================== */
+
+    function scheduleAttendanceRefresh(){
+
+        let nearest = null;
+
+        document
+            .querySelectorAll(
+                "tr[data-appointment-date][data-appointment-time]"
+            )
+            .forEach(function(row){
+
+                if(
+                    !row.querySelector(
+                        ".attendance-before-time"
+                    )
+                ){
+                    return;
+                }
+
+                const dt =
+                    localDateTime(
+                        row.dataset.appointmentDate,
+                        row.dataset.appointmentTime
+                    );
+
+                if(!dt){
+                    return;
+                }
+
+                const diff =
+                    dt.getTime() -
+                    Date.now();
+
+                if(
+                    diff > 0 &&
+                    (nearest === null || diff < nearest)
+                ){
+                    nearest = diff;
+                }
+
+            });
+
+        if(nearest !== null){
+
+            setTimeout(function(){
+                window.location.reload();
+            }, nearest + 700);
+
+        }
+
+    }
+
+    scheduleAttendanceRefresh();
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,1447 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    حجز موعد - MY DOCTOR
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.booking-page {
+
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 30px 20px 60px;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.booking-header {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 7px 25px rgba(15, 23, 42, 0.06);
+
+}
+
+.booking-header h1 {
+
+    margin: 0 0 10px;
+
+    color: #0f172a;
+
+    font-size: 30px;
+
+    font-weight: 800;
+
+}
+
+.booking-header p {
+
+    margin: 7px 0;
+
+    color: #64748b;
+
+}
+
+.doctor-name {
+
+    color: #0d6efd;
+
+    font-weight: 800;
+
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.error-box {
+
+    margin-bottom: 20px;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-weight: 700;
+
+    text-align: center;
+
+}
+
+
+/* =====================================================
+   DAYS
+===================================================== */
+
+.days-title {
+
+    margin: 0 0 15px;
+
+    color: #0f172a;
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+}
+
+.days-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, minmax(140px, 1fr));
+
+    gap: 10px;
+
+    overflow-x: auto;
+
+    margin-bottom: 25px;
+
+}
+
+.day-card {
+
+    min-width: 140px;
+
+    padding: 14px;
+
+    background: white;
+
+    border-radius: 15px;
+
+    border: 2px solid transparent;
+
+    box-shadow:
+        0 7px 25px rgba(15, 23, 42, 0.06);
+
+    transition: 0.2s;
+
+}
+
+.day-card.selected {
+
+    border-color: #0d6efd;
+
+    box-shadow:
+        0 8px 25px rgba(13, 110, 253, 0.15);
+
+}
+
+.day-name {
+
+    color: #0f172a;
+
+    font-weight: 800;
+
+    margin-bottom: 6px;
+
+}
+
+.day-date {
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    margin-bottom: 10px;
+
+}
+
+.day-status {
+
+    padding: 7px;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    margin-bottom: 9px;
+
+}
+
+.day-status.available {
+
+    background: #ecfdf5;
+
+    color: #047857;
+
+}
+
+.day-status.closed {
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+}
+
+.day-button {
+
+    width: 100%;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    padding: 10px;
+
+    background: #0d6efd;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: 700;
+
+}
+
+.day-button:hover {
+
+    background: #0b5ed7;
+
+}
+
+.day-button:disabled {
+
+    background: #94a3b8;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =====================================================
+   SELECTED DAY
+===================================================== */
+
+.selected-day {
+
+    margin-bottom: 20px;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    background: #eff6ff;
+
+    border: 1px solid #bfdbfe;
+
+    text-align: center;
+
+}
+
+.selected-day-label {
+
+    color: #1e40af;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    margin-bottom: 5px;
+
+}
+
+.selected-day-value {
+
+    color: #0f172a;
+
+    font-size: 19px;
+
+    font-weight: 800;
+
+}
+
+
+/* =====================================================
+   TIMES
+===================================================== */
+
+.times-card {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 7px 25px rgba(15, 23, 42, 0.06);
+
+}
+
+.times-card h2 {
+
+    margin: 0 0 6px;
+
+    color: #0f172a;
+
+    font-size: 22px;
+
+}
+
+.times-card p {
+
+    margin: 0 0 15px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+}
+
+.times-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(100px, 1fr));
+
+    gap: 10px;
+
+}
+
+.time-button {
+
+    border: 2px solid #dbeafe;
+
+    border-radius: 10px;
+
+    padding: 12px 8px;
+
+    background: #eff6ff;
+
+    color: #1d4ed8;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+}
+
+.time-button:hover {
+
+    background: #dbeafe;
+
+}
+
+.time-button.selected {
+
+    background: #0d6efd;
+
+    border-color: #0d6efd;
+
+    color: white;
+
+}
+
+.time-button.booked {
+
+    background: #f1f5f9;
+
+    border-color: #e2e8f0;
+
+    color: #94a3b8;
+
+    cursor: not-allowed;
+
+    text-decoration: line-through;
+
+}
+
+.no-times {
+
+    grid-column: 1 / -1;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    text-align: center;
+
+}
+
+
+/* =====================================================
+   BOOKING FORM
+===================================================== */
+
+.booking-card {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 7px 25px rgba(15, 23, 42, 0.06);
+
+}
+
+.booking-card h2 {
+
+    margin: 0 0 18px;
+
+    color: #0f172a;
+
+    font-size: 23px;
+
+}
+
+.selected-info {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+
+}
+
+.info-box {
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    text-align: center;
+
+}
+
+.info-label {
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+
+}
+
+.info-value {
+
+    color: #0f172a;
+
+    font-weight: 800;
+
+}
+
+.form-group {
+
+    margin-bottom: 16px;
+
+}
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+}
+
+.form-group textarea {
+
+    width: 100%;
+
+    min-height: 110px;
+
+    box-sizing: border-box;
+
+    padding: 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: #0f172a;
+
+    resize: vertical;
+
+}
+
+.booking-button {
+
+    width: 100%;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    padding: 14px;
+
+    background: #198754;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    font-weight: 800;
+
+}
+
+.booking-button:hover {
+
+    background: #157347;
+
+}
+
+.booking-button:disabled {
+
+    background: #94a3b8;
+
+    cursor: not-allowed;
+
+}
+
+.back-button {
+
+    display: block;
+
+    margin-top: 10px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background: #64748b;
+
+    color: white;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    font-weight: 700;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 1000px) {
+
+    .days-grid {
+
+        grid-template-columns:
+            repeat(4, minmax(140px, 1fr));
+
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .booking-page {
+
+        padding: 20px 12px 40px;
+
+    }
+
+    .days-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(140px, 1fr));
+
+    }
+
+    .times-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(100px, 1fr));
+
+    }
+
+}
+
+@media (max-width: 450px) {
+
+    .days-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .selected-info {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="booking-page">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <div class="booking-header">
+
+        <h1>
+            📅 حجز موعد
+        </h1>
+
+        <p>
+            الدكتور:
+            <span class="doctor-name">
+                د.
+                {{ doctor.user.get_full_name|default:doctor.user.username }}
+            </span>
+        </p>
+
+        <p>
+            التخصص:
+            {{ doctor.specialty }}
+        </p>
+
+        <p>
+            اختر اليوم ثم اختر الساعة المناسبة.
+        </p>
+
+    </div>
+
+
+    <!-- =================================================
+         ERROR
+    ================================================== -->
+
+    {% if error %}
+
+        <div class="error-box">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <!-- =================================================
+         DAYS
+    ================================================== -->
+
+    <h2 class="days-title">
+        📆 الأيام المتاحة
+    </h2>
+
+
+    <div class="days-grid">
+
+        {% for day in week_days %}
+
+            <div
+                class="day-card"
+                data-date="{{ day.date|date:'Y-m-d' }}"
+                data-weekday="{{ day.weekday }}"
+            >
+
+                <div class="day-name">
+
+                    {% if day.weekday == 5 %}
+                        السبت
+                    {% elif day.weekday == 6 %}
+                        الأحد
+                    {% elif day.weekday == 0 %}
+                        الاثنين
+                    {% elif day.weekday == 1 %}
+                        الثلاثاء
+                    {% elif day.weekday == 2 %}
+                        الأربعاء
+                    {% elif day.weekday == 3 %}
+                        الخميس
+                    {% elif day.weekday == 4 %}
+                        الجمعة
+                    {% endif %}
+
+                </div>
+
+
+                <div class="day-date">
+
+                    {{ day.date|date:"Y-m-d" }}
+
+                </div>
+
+
+                {% if day.schedule %}
+
+                    <div class="day-status available">
+                        🟢 متاح للحجز
+                    </div>
+
+                    <button
+                        type="button"
+                        class="day-button"
+                        data-date="{{ day.date|date:'Y-m-d' }}"
+                        data-weekday="{{ day.weekday }}"
+                    >
+                        اختيار اليوم
+                    </button>
+
+                {% else %}
+
+                    <div class="day-status closed">
+                        🔴 غير متاح
+                    </div>
+
+                    <button
+                        type="button"
+                        class="day-button"
+                        disabled
+                    >
+                        غير متاح
+                    </button>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =================================================
+         SELECTED DAY
+    ================================================== -->
+
+    <div class="selected-day">
+
+        <div class="selected-day-label">
+            اليوم المختار
+        </div>
+
+        <div
+            class="selected-day-value"
+            id="selected-day-value"
+        >
+            لم يتم اختيار يوم
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         TIMES
+    ================================================== -->
+
+    <div class="times-card">
+
+        <h2>
+            🕐 الساعات المتاحة
+        </h2>
+
+        <p>
+            الساعات تظهر تلقائيًا حسب جدول عمل الدكتور ومدة الكشف.
+        </p>
+
+
+        <div
+            class="times-grid"
+            id="times-grid"
+        >
+
+            <div class="no-times">
+                اختر يومًا أولًا لعرض الساعات.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         BOOKING FORM
+    ================================================== -->
+
+    <div class="booking-card">
+
+        <h2>
+            📝 بيانات الحجز
+        </h2>
+
+
+        <form
+            method="POST"
+            action="{% url 'book_appointment' doctor.id %}"
+            id="booking-form"
+        >
+
+            {% csrf_token %}
+
+
+            <input
+                type="hidden"
+                name="date"
+                id="selected-date"
+            >
+
+
+            <input
+                type="hidden"
+                name="time"
+                id="selected-time"
+            >
+
+
+            <div class="selected-info">
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        اليوم
+                    </div>
+
+                    <div
+                        class="info-value"
+                        id="selected-date-display"
+                    >
+                        لم يتم الاختيار
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        الساعة
+                    </div>
+
+                    <div
+                        class="info-value"
+                        id="selected-time-display"
+                    >
+                        لم يتم الاختيار
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="notes">
+                    📝 التفاصيل
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    placeholder="اكتب أي تفاصيل تريد إرسالها للدكتور..."
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="booking-button"
+                id="booking-submit"
+                disabled
+            >
+                ✅ تأكيد الحجز
+            </button>
+
+
+            <a
+                href="{% url 'doctors' %}"
+                class="back-button"
+            >
+                ← العودة إلى الأطباء
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =================================================
+     DJANGO DATA
+================================================== -->
+
+{{ schedules_data|json_script:"schedules-data" }}
+
+{{ booked_appointments|json_script:"booked-data" }}
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const schedulesElement =
+            document.getElementById(
+                "schedules-data"
+            );
+
+        const bookedElement =
+            document.getElementById(
+                "booked-data"
+            );
+
+        const schedules =
+            schedulesElement
+                ? JSON.parse(
+                    schedulesElement.textContent
+                )
+                : [];
+
+        const bookedAppointments =
+            bookedElement
+                ? JSON.parse(
+                    bookedElement.textContent
+                )
+                : [];
+
+
+        const selectedDateInput =
+            document.getElementById(
+                "selected-date"
+            );
+
+        const selectedTimeInput =
+            document.getElementById(
+                "selected-time"
+            );
+
+        const selectedDateDisplay =
+            document.getElementById(
+                "selected-date-display"
+            );
+
+        const selectedTimeDisplay =
+            document.getElementById(
+                "selected-time-display"
+            );
+
+        const selectedDayValue =
+            document.getElementById(
+                "selected-day-value"
+            );
+
+        const timesGrid =
+            document.getElementById(
+                "times-grid"
+            );
+
+        const bookingSubmit =
+            document.getElementById(
+                "booking-submit"
+            );
+
+
+        /* =================================================
+           FIND SCHEDULE
+        ================================================= */
+
+        function getSchedule(weekday) {
+
+            return schedules.find(
+                function (item) {
+
+                    return Number(
+                        item.weekday
+                    ) === Number(
+                        weekday
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CHECK BOOKED
+        ================================================= */
+
+        function isBooked(
+            dateString,
+            timeString
+        ) {
+
+            return bookedAppointments.some(
+                function (item) {
+
+                    return (
+                        String(item.date)
+                        ===
+                        String(dateString)
+                    )
+                    &&
+                    (
+                        String(item.time)
+                        .slice(0, 5)
+                        ===
+                        String(timeString)
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           BUILD TIME SLOTS
+        ================================================= */
+
+        function buildSlots(
+            startTime,
+            endTime,
+            duration
+        ) {
+
+            const result = [];
+
+            const start =
+                startTime.split(":");
+
+            const end =
+                endTime.split(":");
+
+            let current =
+                (
+                    Number(start[0]) * 60
+                )
+                +
+                Number(start[1]);
+
+            const finish =
+                (
+                    Number(end[0]) * 60
+                )
+                +
+                Number(end[1]);
+
+
+            duration =
+                Number(duration);
+
+
+            if (
+                !duration ||
+                duration < 1
+            ) {
+
+                return result;
+
+            }
+
+
+            while (
+                current < finish
+            ) {
+
+                const hour =
+                    Math.floor(
+                        current / 60
+                    );
+
+                const minute =
+                    current % 60;
+
+
+                result.push(
+
+                    String(hour).padStart(
+                        2,
+                        "0"
+                    )
+                    +
+                    ":"
+                    +
+                    String(minute).padStart(
+                        2,
+                        "0"
+                    )
+
+                );
+
+
+                current +=
+                    duration;
+
+            }
+
+
+            return result;
+
+        }
+
+
+        /* =================================================
+           SELECT DAY
+        ================================================= */
+
+        function selectDay(
+            dateString,
+            weekday
+        ) {
+
+            selectedDateInput.value =
+                dateString;
+
+            selectedTimeInput.value =
+                "";
+
+            selectedTimeDisplay.textContent =
+                "لم يتم الاختيار";
+
+            bookingSubmit.disabled =
+                true;
+
+
+            selectedDateDisplay.textContent =
+                dateString;
+
+            selectedDayValue.textContent =
+                dateString;
+
+
+            document
+                .querySelectorAll(
+                    ".day-card"
+                )
+                .forEach(
+                    function (card) {
+
+                        card.classList.remove(
+                            "selected"
+                        );
+
+                    }
+                );
+
+
+            const selectedCard =
+                document.querySelector(
+                    '.day-card[data-date="' +
+                    dateString +
+                    '"]'
+                );
+
+
+            if (selectedCard) {
+
+                selectedCard.classList.add(
+                    "selected"
+                );
+
+            }
+
+
+            renderTimes(
+                dateString,
+                weekday
+            );
+
+        }
+
+
+        /* =================================================
+           RENDER TIMES
+        ================================================= */
+
+        function renderTimes(
+            dateString,
+            weekday
+        ) {
+
+            timesGrid.innerHTML = "";
+
+
+            const schedule =
+                getSchedule(
+                    weekday
+                );
+
+
+            if (!schedule) {
+
+                timesGrid.innerHTML =
+                    '<div class="no-times">' +
+                    'لا توجد مواعيد عمل في هذا اليوم.' +
+                    '</div>';
+
+                return;
+
+            }
+
+
+            const slots =
+                buildSlots(
+                    schedule.start_time,
+                    schedule.end_time,
+                    schedule.appointment_duration
+                );
+
+
+            if (!slots.length) {
+
+                timesGrid.innerHTML =
+                    '<div class="no-times">' +
+                    'لا توجد ساعات متاحة.' +
+                    '</div>';
+
+                return;
+
+            }
+
+
+            let availableCount =
+                0;
+
+
+            slots.forEach(
+                function (time) {
+
+                    const button =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    button.type =
+                        "button";
+
+                    button.className =
+                        "time-button";
+
+                    button.textContent =
+                        time;
+
+
+                    if (
+                        isBooked(
+                            dateString,
+                            time
+                        )
+                    ) {
+
+                        button.classList.add(
+                            "booked"
+                        );
+
+                        button.disabled =
+                            true;
+
+                    }
+
+                    else {
+
+                        availableCount +=
+                            1;
+
+
+                        button.addEventListener(
+                            "click",
+                            function () {
+
+                                document
+                                    .querySelectorAll(
+                                        ".time-button"
+                                    )
+                                    .forEach(
+                                        function (item) {
+                                            item.classList.remove(
+                                                "selected"
+                                            );
+                                        }
+                                    );
+
+
+                                button.classList.add(
+                                    "selected"
+                                );
+
+
+                                selectedTimeInput.value =
+                                    time;
+
+
+                                selectedTimeDisplay.textContent =
+                                    time;
+
+
+                                bookingSubmit.disabled =
+                                    false;
+
+                            }
+                        );
+
+                    }
+
+
+                    timesGrid.appendChild(
+                        button
+                    );
+
+                }
+            );
+
+
+            if (
+                availableCount === 0
+            ) {
+
+                timesGrid.innerHTML =
+                    '<div class="no-times">' +
+                    'لا توجد ساعات شاغرة في هذا اليوم.' +
+                    '</div>';
+
+            }
+
+        }
+
+
+        /* =================================================
+           DAY BUTTONS
+        ================================================= */
+
+        document
+            .querySelectorAll(
+                ".day-button:not(:disabled)"
+            )
+            .forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            selectDay(
+                                button.dataset.date,
+                                Number(
+                                    button.dataset.weekday
+                                )
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =================================================
+           FORM
+        ================================================= */
+
+        document
+            .getElementById(
+                "booking-form"
+            )
+            .addEventListener(
+                "submit",
+                function (event) {
+
+                    if (
+                        !selectedDateInput.value
+                        ||
+                        !selectedTimeInput.value
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "من فضلك اختر اليوم والساعة."
+                        );
+
+                    }
+
+                }
+            );
+
+
+        /* =================================================
+           AUTO SELECT FIRST AVAILABLE DAY
+        ================================================= */
+
+        const firstAvailable =
+            document.querySelector(
+                ".day-button:not(:disabled)"
+            );
+
+
+        if (firstAvailable) {
+
+            firstAvailable.click();
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

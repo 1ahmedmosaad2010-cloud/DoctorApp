@@ -1,0 +1,401 @@
+{% extends "accounts/base.html" %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+
+        <div>
+            <h1>مواعيد العمل 🕐</h1>
+
+            <p>
+                يمكنك تحديد أيام وساعات العمل الخاصة بك،
+                ويمكنك تعديلها في أي وقت.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card schedule-card">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            {% if error %}
+
+                <div class="form-errors">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            <div class="schedule-list">
+
+
+                <!-- السبت -->
+                <div class="schedule-row">
+
+                    <div class="schedule-day">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="is_active_5"
+                                {% if schedules_by_day.5.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            السبت
+                        </label>
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>من</label>
+
+                        <input
+                            type="time"
+                            name="start_time_5"
+                            value="{% if schedules_by_day.5 %}{{ schedules_by_day.5.start_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>إلى</label>
+
+                        <input
+                            type="time"
+                            name="end_time_5"
+                            value="{% if schedules_by_day.5 %}{{ schedules_by_day.5.end_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- الأحد -->
+                <div class="schedule-row">
+
+                    <div class="schedule-day">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="is_active_6"
+                                {% if schedules_by_day.6.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            الأحد
+                        </label>
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>من</label>
+
+                        <input
+                            type="time"
+                            name="start_time_6"
+                            value="{% if schedules_by_day.6 %}{{ schedules_by_day.6.start_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>إلى</label>
+
+                        <input
+                            type="time"
+                            name="end_time_6"
+                            value="{% if schedules_by_day.6 %}{{ schedules_by_day.6.end_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- الاثنين -->
+                <div class="schedule-row">
+
+                    <div class="schedule-day">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="is_active_0"
+                                {% if schedules_by_day.0.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            الاثنين
+                        </label>
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>من</label>
+
+                        <input
+                            type="time"
+                            name="start_time_0"
+                            value="{% if schedules_by_day.0 %}{{ schedules_by_day.0.start_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>إلى</label>
+
+                        <input
+                            type="time"
+                            name="end_time_0"
+                            value="{% if schedules_by_day.0 %}{{ schedules_by_day.0.end_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- الثلاثاء -->
+                <div class="schedule-row">
+
+                    <div class="schedule-day">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="is_active_1"
+                                {% if schedules_by_day.1.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            الثلاثاء
+                        </label>
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>من</label>
+
+                        <input
+                            type="time"
+                            name="start_time_1"
+                            value="{% if schedules_by_day.1 %}{{ schedules_by_day.1.start_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>إلى</label>
+
+                        <input
+                            type="time"
+                            name="end_time_1"
+                            value="{% if schedules_by_day.1 %}{{ schedules_by_day.1.end_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- الأربعاء -->
+                <div class="schedule-row">
+
+                    <div class="schedule-day">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="is_active_2"
+                                {% if schedules_by_day.2.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            الأربعاء
+                        </label>
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>من</label>
+
+                        <input
+                            type="time"
+                            name="start_time_2"
+                            value="{% if schedules_by_day.2 %}{{ schedules_by_day.2.start_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>إلى</label>
+
+                        <input
+                            type="time"
+                            name="end_time_2"
+                            value="{% if schedules_by_day.2 %}{{ schedules_by_day.2.end_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- الخميس -->
+                <div class="schedule-row">
+
+                    <div class="schedule-day">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="is_active_3"
+                                {% if schedules_by_day.3.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            الخميس
+                        </label>
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>من</label>
+
+                        <input
+                            type="time"
+                            name="start_time_3"
+                            value="{% if schedules_by_day.3 %}{{ schedules_by_day.3.start_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>إلى</label>
+
+                        <input
+                            type="time"
+                            name="end_time_3"
+                            value="{% if schedules_by_day.3 %}{{ schedules_by_day.3.end_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- الجمعة -->
+                <div class="schedule-row">
+
+                    <div class="schedule-day">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="is_active_4"
+                                {% if schedules_by_day.4.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            الجمعة
+                        </label>
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>من</label>
+
+                        <input
+                            type="time"
+                            name="start_time_4"
+                            value="{% if schedules_by_day.4 %}{{ schedules_by_day.4.start_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="schedule-time">
+
+                        <label>إلى</label>
+
+                        <input
+                            type="time"
+                            name="end_time_4"
+                            value="{% if schedules_by_day.4 %}{{ schedules_by_day.4.end_time|time:'H:i' }}{% endif %}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-btn"
+                style="margin-top: 25px;"
+            >
+                حفظ مواعيد العمل 💾
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+    <a
+        href="{% url 'dashboard' %}"
+        class="back-button"
+    >
+        ← العودة إلى لوحة التحكم
+    </a>
+
+</div>
+
+{% endblock %}

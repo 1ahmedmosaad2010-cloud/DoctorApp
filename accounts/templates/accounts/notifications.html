@@ -1,0 +1,448 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    الإشعارات | MY DOCTOR
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <style>
+        .notification-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .notification-tab {
+            border: 0;
+            border-radius: 12px;
+            padding: 12px 10px;
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .notification-tab.active {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+        .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            margin-right: 4px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.25);
+            font-size: 11px;
+        }
+
+        .notification-section {
+            display: none;
+        }
+
+        .notification-section.active-section {
+            display: block;
+        }
+
+        .notification-chat-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 14px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 5px 18px rgba(15,23,42,.05);
+        }
+
+        .notification-chat-icon {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #eef2ff;
+            font-size: 20px;
+        }
+
+        .notification-chat-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-chat-content h2 {
+            margin: 0 0 6px;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .notification-chat-content p {
+            margin: 0 0 7px;
+            color: #475569;
+            line-height: 1.7;
+            font-size: 12px;
+        }
+
+        .notification-chat-content small {
+            display: block;
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        .notification-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 130px;
+            margin-top: 8px;
+            padding: 9px 12px;
+            border-radius: 9px;
+            color: #fff;
+            background: #0d6efd;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .notification-action.chat {
+            background: #0d6efd;
+        }
+
+        .notification-action.booking {
+            background: #198754;
+        }
+
+        .notification-action.follow-up {
+            background: #7c3aed;
+        }
+
+        .notification-action.default {
+            background: #64748b;
+        }
+
+        .empty-notification-card {
+            padding: 40px 20px;
+            background: #fff;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+
+        .empty-icon {
+            margin-bottom: 10px;
+            font-size: 46px;
+        }
+
+        .empty-notification-card h2 {
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .empty-notification-card p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        @media (max-width: 700px) {
+            .notification-chat-card {
+                flex-direction: column;
+            }
+
+            .notification-action {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <header class="dashboard-header">
+        <div>
+            <h1>🔔 الإشعارات</h1>
+            <p>تابع آخر التنبيهات والتحديثات الخاصة بحسابك.</p>
+        </div>
+    </header>
+
+    <div class="notification-tabs">
+
+        <button
+            type="button"
+            class="notification-tab active"
+            onclick="showTab('all', this)"
+        >
+            🔔 كل الإشعارات
+            <span class="tab-count">
+                {{ notifications|length }}
+            </span>
+        </button>
+
+        <button
+            type="button"
+            class="notification-tab"
+            onclick="showTab('unread', this)"
+        >
+            🔴 غير المقروءة
+            <span class="tab-count">
+                {{ unread_count|default:0 }}
+            </span>
+        </button>
+
+    </div>
+
+    <section
+        id="all"
+        class="notification-section active-section"
+    >
+
+        {% if notifications %}
+
+            {% for notification in notifications %}
+
+                <div class="notification-chat-card">
+
+                    <div class="notification-chat-icon">
+
+                        {% if "رسالة" in notification.title %}
+                            💬
+                        {% elif "إعادة كشف" in notification.title %}
+                            🔄
+                        {% elif "رفض" in notification.title %}
+                            ❌
+                        {% elif "قبول" in notification.title %}
+                            ✅
+                        {% elif "حجز" in notification.title %}
+                            📅
+                        {% else %}
+                            🔔
+                        {% endif %}
+
+                    </div>
+
+                    <div class="notification-chat-content">
+
+                        <h2>
+                            {{ notification.title }}
+                        </h2>
+
+                        <p>
+                            {{ notification.message }}
+                        </p>
+
+                        <small>
+                            {{ notification.created_at|date:"Y-m-d H:i" }}
+                        </small>
+
+                        {% if notification.url %}
+
+                            {% if "رسالة" in notification.title %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action chat"
+                                >
+                                    💬 فتح الشات
+                                </a>
+
+                            {% elif "إعادة كشف" in notification.title %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action follow-up"
+                                >
+                                    🔄 فتح إعادة الكشف
+                                </a>
+
+                            {% elif "حجز" in notification.title or "قبول" in notification.title or "رفض" in notification.title %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action booking"
+                                >
+                                    📅 فتح الحجز
+                                </a>
+
+                            {% else %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action default"
+                                >
+                                    📂 فتح
+                                </a>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-notification-card">
+                <div class="empty-icon">🔕</div>
+                <h2>لا توجد إشعارات</h2>
+                <p>لا توجد إشعارات لديك حاليًا.</p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+    <section
+        id="unread"
+        class="notification-section"
+    >
+
+        {% if unread_notifications %}
+
+            {% for notification in unread_notifications %}
+
+                <div class="notification-chat-card">
+
+                    <div class="notification-chat-icon">
+                        🔴
+                    </div>
+
+                    <div class="notification-chat-content">
+
+                        <h2>
+                            {{ notification.title }}
+                        </h2>
+
+                        <p>
+                            {{ notification.message }}
+                        </p>
+
+                        <small>
+                            {{ notification.created_at|date:"Y-m-d H:i" }}
+                        </small>
+
+                        {% if notification.url %}
+
+                            {% if "رسالة" in notification.title %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action chat"
+                                >
+                                    💬 فتح الشات
+                                </a>
+
+                            {% elif "إعادة كشف" in notification.title %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action follow-up"
+                                >
+                                    🔄 فتح إعادة الكشف
+                                </a>
+
+                            {% elif "حجز" in notification.title or "قبول" in notification.title or "رفض" in notification.title %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action booking"
+                                >
+                                    📅 فتح الحجز
+                                </a>
+
+                            {% else %}
+
+                                <a
+                                    href="{{ notification.url }}"
+                                    class="notification-action default"
+                                >
+                                    📂 فتح
+                                </a>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-notification-card">
+
+                <div class="empty-icon">
+                    ✅
+                </div>
+
+                <h2>
+                    لا توجد إشعارات جديدة
+                </h2>
+
+                <p>
+                    لقد قرأت جميع إشعاراتك.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+<script>
+function showTab(tabId, button) {
+
+    const sections =
+        document.querySelectorAll(
+            ".notification-section"
+        );
+
+    const buttons =
+        document.querySelectorAll(
+            ".notification-tab"
+        );
+
+    sections.forEach(function(section) {
+        section.classList.remove(
+            "active-section"
+        );
+    });
+
+    buttons.forEach(function(tabButton) {
+        tabButton.classList.remove(
+            "active"
+        );
+    });
+
+    const selectedSection =
+        document.getElementById(tabId);
+
+    if (selectedSection) {
+        selectedSection.classList.add(
+            "active-section"
+        );
+    }
+
+    if (button) {
+        button.classList.add(
+            "active"
+        );
+    }
+}
+</script>
+
+{% endblock %}

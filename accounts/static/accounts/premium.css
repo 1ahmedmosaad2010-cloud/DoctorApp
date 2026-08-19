@@ -1,0 +1,582 @@
+/* =========================================================
+   MY DOCTOR — PREMIUM GLOBAL THEME
+   Visual layer only. No application logic changed.
+========================================================= */
+
+:root{
+  --ui-bg:#f3f7fb;
+  --ui-surface:rgba(255,255,255,.92);
+  --ui-surface-solid:#fff;
+  --ui-primary:#0f766e;
+  --ui-primary-2:#0d9488;
+  --ui-blue:#2563eb;
+  --ui-purple:#7c3aed;
+  --ui-ink:#0f172a;
+  --ui-muted:#64748b;
+  --ui-line:rgba(148,163,184,.22);
+  --ui-shadow:0 18px 45px rgba(15,23,42,.08);
+  --ui-shadow-sm:0 8px 22px rgba(15,23,42,.06);
+  --ui-radius:20px;
+}
+
+html{
+  background:var(--ui-bg);
+}
+
+body{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(13,148,136,.11), transparent 25%),
+    radial-gradient(circle at 92% 4%, rgba(37,99,235,.10), transparent 24%),
+    linear-gradient(145deg,#f7fbff 0%,#eef8f7 52%,#f7f5ff 100%) !important;
+  color:var(--ui-ink) !important;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:
+    linear-gradient(rgba(255,255,255,.32),rgba(255,255,255,.32)),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 28px,
+      rgba(15,118,110,.014) 28px 30px
+    );
+}
+
+.site-header{
+  padding:14px 18px 0 !important;
+}
+
+.main-navbar{
+  max-width:1500px !important;
+  min-height:72px !important;
+  padding:9px 12px !important;
+  border:1px solid rgba(226,232,240,.9) !important;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.88) !important;
+  box-shadow:0 16px 38px rgba(15,23,42,.09) !important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.navbar-logo{
+  color:var(--ui-primary) !important;
+}
+
+.navbar-logo-icon{
+  background:linear-gradient(135deg,#e6fffb,#eef6ff) !important;
+  border:1px solid rgba(13,148,136,.10);
+  box-shadow:0 8px 20px rgba(13,148,136,.10) !important;
+}
+
+.navbar-link{
+  min-height:42px !important;
+  border-radius:13px !important;
+}
+
+.navbar-link:hover{
+  background:linear-gradient(135deg,#effcfb,#f1f7ff) !important;
+  color:var(--ui-primary) !important;
+}
+
+.navbar-link.active{
+  background:linear-gradient(135deg,#e7f9f7,#edf5ff) !important;
+  color:var(--ui-primary) !important;
+  border-color:rgba(13,148,136,.10) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(13,148,136,.06),
+    0 6px 16px rgba(13,148,136,.06) !important;
+}
+
+.navbar-badge{
+  background:linear-gradient(135deg,#ef4444,#dc2626) !important;
+  box-shadow:0 5px 12px rgba(239,68,68,.18);
+}
+
+.navbar-user{
+  background:linear-gradient(135deg,#f9fbfd,#f1f7f7) !important;
+  border-color:rgba(148,163,184,.20) !important;
+}
+
+.navbar-user-avatar{
+  background:linear-gradient(135deg,#fff,#ecfdfb) !important;
+  color:var(--ui-primary) !important;
+}
+
+.navbar-logout{
+  background:#fff1f2 !important;
+}
+
+.site-main{
+  min-height:calc(100vh - 150px);
+}
+
+/* Global containers/cards */
+.dashboard-page,
+.doctor-appointments-page,
+.page-container{
+  position:relative;
+}
+
+.dashboard-page > *,
+.doctor-appointments-page > *,
+.page-container > *{
+  position:relative;
+}
+
+/* Generic cards */
+.dashboard-card,
+.dashboard-header,
+.table-shell,
+.new-bookings-panel,
+.next-panel,
+.next-appointment-panel,
+.next-follow-up-panel,
+.day-selector,
+.schedule-day-selector,
+.follow-up-panel,
+.notification-chat-card,
+.empty-notification-card,
+.auth-card,
+.login-card,
+.register-card,
+.doctor-card,
+.review-card,
+.message-card,
+.chat-container,
+.chat-box,
+.schedule-card,
+.profile-card{
+  border:1px solid var(--ui-line) !important;
+  border-radius:var(--ui-radius) !important;
+  background:var(--ui-surface) !important;
+  box-shadow:var(--ui-shadow-sm) !important;
+  backdrop-filter:blur(10px);
+}
+
+.dashboard-card:hover,
+.doctor-card:hover,
+.notification-chat-card:hover,
+.review-card:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--ui-shadow) !important;
+}
+
+/* Headers / section titles */
+.page-title,
+.page-header h1,
+.dashboard-header h1,
+.dashboard-header h2,
+.table-title,
+.next-appointment-title,
+.next-follow-up-title,
+.next-title{
+  color:var(--ui-ink) !important;
+}
+
+.page-title{
+  font-weight:950;
+  letter-spacing:-.4px;
+}
+
+/* Tabs */
+.appointment-tabs,
+.booking-status-tabs,
+.doctor-period-tabs,
+.appointment-period-tabs,
+.follow-period-tabs,
+.notification-tabs{
+  border:1px solid var(--ui-line) !important;
+  background:rgba(255,255,255,.72) !important;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.75),
+    0 8px 18px rgba(15,23,42,.04) !important;
+  border-radius:16px !important;
+}
+
+.appointment-tab,
+.booking-status-tab,
+.doctor-tab,
+.doctor-period-tab,
+.appointment-period-tab,
+.follow-period-tab,
+.notification-tab{
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease !important;
+}
+
+.appointment-tab:hover,
+.booking-status-tab:hover,
+.doctor-tab:hover,
+.doctor-period-tab:hover,
+.appointment-period-tab:hover,
+.follow-period-tab:hover,
+.notification-tab:hover{
+  transform:translateY(-1px);
+}
+
+.appointment-tab.active,
+.doctor-tab.active,
+.appointment-period-tab.active{
+  background:
+    linear-gradient(
+      135deg,
+      var(--ui-primary),
+      var(--ui-primary-2)
+    ) !important;
+  box-shadow:0 9px 20px rgba(13,148,136,.18) !important;
+  color:#fff !important;
+}
+
+.appointment-tab.follow-up.active,
+.doctor-tab.follow.active,
+.follow-period-tab.active{
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #9333ea
+    ) !important;
+  box-shadow:0 9px 20px rgba(124,58,237,.18) !important;
+  color:#fff !important;
+}
+
+.appointment-period-tab.past.active,
+.doctor-period-tab.past.active{
+  background:
+    linear-gradient(
+      135deg,
+      #475569,
+      #64748b
+    ) !important;
+  box-shadow:0 9px 20px rgba(71,85,105,.16) !important;
+  color:#fff !important;
+}
+
+/* Buttons */
+button,
+.chat-button,
+.cancel-button,
+.doctors-button,
+.action-button,
+.attendance-button,
+.follow-up-button,
+.follow-up-submit,
+.quick-accept,
+.quick-reject,
+.rating-button,
+.navbar-login{
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    filter .2s ease !important;
+}
+
+button:hover,
+.chat-button:hover,
+.cancel-button:hover,
+.doctors-button:hover,
+.action-button:hover,
+.attendance-button:hover,
+.follow-up-button:hover,
+.follow-up-submit:hover,
+.quick-accept:hover,
+.quick-reject:hover,
+.rating-button:hover,
+.navbar-login:hover{
+  transform:translateY(-2px);
+  filter:saturate(1.03);
+}
+
+/* Blue buttons */
+.chat-button,
+.doctors-button,
+.navbar-login{
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    ) !important;
+  box-shadow:0 9px 20px rgba(37,99,235,.18) !important;
+}
+
+/* Teal primary buttons */
+.accept-button,
+.attended-button{
+  background:
+    linear-gradient(
+      135deg,
+      #10b981,
+      #059669
+    ) !important;
+  box-shadow:0 8px 18px rgba(16,185,129,.14) !important;
+}
+
+/* Purple */
+.follow-up-button,
+.follow-up-submit{
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #9333ea
+    ) !important;
+  box-shadow:0 8px 18px rgba(124,58,237,.16) !important;
+}
+
+/* Danger */
+.reject-button,
+.quick-reject,
+.cancel-button{
+  background:
+    linear-gradient(
+      135deg,
+      #ef4444,
+      #dc2626
+    ) !important;
+  box-shadow:0 8px 18px rgba(239,68,68,.14) !important;
+}
+
+/* Inputs */
+input,
+select,
+textarea{
+  border-color:rgba(148,163,184,.30) !important;
+  background:rgba(255,255,255,.96) !important;
+  color:var(--ui-ink) !important;
+  border-radius:11px !important;
+  outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:rgba(13,148,136,.55) !important;
+  box-shadow:0 0 0 4px rgba(13,148,136,.09) !important;
+}
+
+/* Tables */
+.appointments-table{
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+}
+
+.appointments-table thead th{
+  background:
+    linear-gradient(
+      180deg,
+      #fbfeff,
+      #f1f6f8
+    ) !important;
+  color:#334155 !important;
+}
+
+.appointments-table tbody tr:hover td{
+  background:#f8fcfc !important;
+}
+
+.appointments-table tbody tr td{
+  border-bottom-color:rgba(148,163,184,.15) !important;
+}
+
+/* Status */
+.status{
+  border:1px solid rgba(148,163,184,.12) !important;
+}
+
+/* Day selectors */
+.day-selector,
+.schedule-day-selector{
+  background:rgba(255,255,255,.90) !important;
+}
+
+.day-btn,
+.schedule-day-btn,
+.follow-up-day-btn{
+  background:
+    linear-gradient(
+      145deg,
+      #fff,
+      #f7fafb
+    ) !important;
+  border-color:#d9e3e8 !important;
+  transition:.2s ease !important;
+}
+
+.day-btn:hover,
+.schedule-day-btn:hover,
+.follow-up-day-btn:hover{
+  border-color:rgba(13,148,136,.35) !important;
+  transform:translateY(-2px);
+}
+
+.day-btn.active,
+.schedule-day-btn.active{
+  background:
+    linear-gradient(
+      135deg,
+      var(--ui-primary),
+      var(--ui-primary-2)
+    ) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+  box-shadow:0 8px 18px rgba(13,148,136,.18) !important;
+}
+
+.follow-day-btn.active,
+.follow-up-filter-btn.active,
+.follow-up-day-btn.selected{
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #9333ea
+    ) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+  box-shadow:0 8px 18px rgba(124,58,237,.18) !important;
+}
+
+/* Notification cards */
+.notification-chat-card{
+  padding:18px !important;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.96),
+      rgba(247,252,252,.94)
+    ) !important;
+}
+
+.notification-chat-icon{
+  background:
+    linear-gradient(
+      135deg,
+      #e6fffb,
+      #edf5ff
+    ) !important;
+  box-shadow:0 8px 20px rgba(13,148,136,.10) !important;
+}
+
+/* Footer */
+.site-footer{
+  margin-top:40px;
+  padding:30px 20px !important;
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #123247
+    ) !important;
+  color:#e2e8f0 !important;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+.footer-content{
+  max-width:1400px;
+  margin:0 auto;
+}
+
+.footer-logo{
+  color:#fff !important;
+}
+
+/* Prevent accidental code-like wrapping */
+code,
+pre,
+pre code{
+  font-family:inherit;
+}
+
+/* Mobile nav */
+@media(max-width:1050px){
+
+  .main-navbar{
+    flex-wrap:wrap;
+    padding:10px !important;
+  }
+
+  .navbar-logo{
+    min-width:auto;
+    flex:1;
+  }
+
+  .navbar-user{
+    min-width:auto;
+  }
+
+  .navbar-links{
+    order:3;
+    width:100%;
+    justify-content:flex-start;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    padding-top:4px;
+  }
+}
+
+@media(max-width:700px){
+
+  .site-header{
+    padding:8px 8px 0 !important;
+  }
+
+  .main-navbar{
+    top:6px;
+    border-radius:17px !important;
+  }
+
+  .navbar-user-info,
+  .navbar-logout{
+    display:none;
+  }
+
+  .navbar-user{
+    padding:5px;
+    background:transparent !important;
+    border:0 !important;
+  }
+
+  .navbar-link{
+    min-width:max-content;
+    padding:8px 10px;
+  }
+}
+
+
+/* =========================================================
+   RESTORE NAVBAR GRAY HORIZONTAL SCROLLBAR
+========================================================= */
+
+.navbar-links{
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  white-space:nowrap !important;
+  scrollbar-width:auto !important;
+  -ms-overflow-style:auto !important;
+}
+
+.navbar-links::-webkit-scrollbar{
+  width:8px !important;
+  height:8px !important;
+  display:block !important;
+}
+
+.navbar-links::-webkit-scrollbar-track{
+  background:transparent !important;
+}
+
+.navbar-links::-webkit-scrollbar-thumb{
+  background:#9ca3af !important;
+  border-radius:10px !important;
+}
+
+.navbar-links::-webkit-scrollbar-thumb:hover{
+  background:#6b7280 !important;
+}

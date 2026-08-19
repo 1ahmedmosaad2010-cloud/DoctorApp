@@ -1,0 +1,958 @@
+<style id="logout-navbar-fix">
+.home-nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.home-nav-logout-form {
+    margin: 0;
+    padding: 0;
+}
+
+.home-nav-logout {
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    line-height: 1;
+}
+
+@media (max-width: 600px) {
+    .home-nav-links {
+        width: 100%;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .home-nav-logout-form,
+    .home-nav-logout {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+</style>
+
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    MY DOCTOR - منصتك الطبية
+{% endblock %}
+
+{% block body_class %}
+    home-body
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .home-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #eef7ff 0%, #ffffff 55%, #f5fbff 100%);
+        direction: rtl;
+        font-family: Arial, Tahoma, sans-serif;
+        color: #102a43;
+    }
+
+    /* =========================
+       NAVBAR
+    ========================== */
+
+    .home-nav {
+        width: 100%;
+        max-width: 1250px;
+        margin: auto;
+        padding: 22px 30px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .home-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .home-brand-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #1976d2;
+        color: white;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 25px;
+        box-shadow: 0 8px 20px rgba(25, 118, 210, 0.20);
+    }
+
+    .home-brand-name {
+        color: #1769aa;
+        font-size: 25px;
+        font-weight: 800;
+        direction: ltr;
+    }
+
+    .home-nav-links {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .home-nav-link {
+        text-decoration: none;
+        color: #536b7d;
+        padding: 11px 17px;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+
+    .home-nav-link:hover {
+        color: #1976d2;
+        background: #eaf5ff;
+    }
+
+    .home-nav-login {
+        background: #1976d2;
+        color: white;
+    }
+
+    .home-nav-login:hover {
+        color: white;
+        background: #125ca3;
+    }
+
+
+    /* =========================
+       HERO
+    ========================== */
+
+    .home-page main {
+        width: 100%;
+    }
+
+    .hero {
+        width: 100%;
+        max-width: 1250px;
+        min-height: 620px;
+
+        margin: auto;
+        padding: 55px 30px 80px;
+
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 60px;
+    }
+
+    .hero-content {
+        max-width: 590px;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+
+        background: #e5f3ff;
+        color: #1976d2;
+
+        padding: 10px 17px;
+        border-radius: 30px;
+
+        font-size: 15px;
+        font-weight: bold;
+
+        margin-bottom: 25px;
+    }
+
+    .hero-title {
+        font-size: 58px;
+        line-height: 1.25;
+        margin: 0 0 25px;
+        color: #102a43;
+    }
+
+    .hero-title span {
+        color: #1976d2;
+    }
+
+    .hero-description {
+        color: #5b7083;
+        font-size: 18px;
+        line-height: 2;
+        max-width: 560px;
+        margin: 0 0 35px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .hero-button {
+        min-width: 190px;
+        height: 55px;
+
+        padding: 0 25px;
+
+        border-radius: 13px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: bold;
+
+        transition: 0.2s;
+    }
+
+    .register-button-home {
+        background: #1976d2;
+        color: white;
+        box-shadow: 0 10px 25px rgba(25, 118, 210, 0.20);
+    }
+
+    .register-button-home:hover {
+        background: #125ca3;
+        transform: translateY(-2px);
+    }
+
+    .login-button-home {
+        background: white;
+        color: #1976d2;
+        border: 1px solid #b9d9f4;
+    }
+
+    .login-button-home:hover {
+        background: #eef7ff;
+        transform: translateY(-2px);
+    }
+
+
+    /* =========================
+       HERO VISUAL
+    ========================== */
+
+    .hero-visual {
+        min-height: 470px;
+        position: relative;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .medical-circle {
+        width: 350px;
+        height: 350px;
+
+        border-radius: 50%;
+
+        background:
+            radial-gradient(
+                circle at center,
+                #ffffff 0%,
+                #e7f5ff 55%,
+                #cfeaff 100%
+            );
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        box-shadow:
+            0 25px 60px rgba(25, 118, 210, 0.12);
+    }
+
+    .medical-icon {
+        width: 150px;
+        height: 150px;
+
+        border-radius: 35px;
+
+        background: #1976d2;
+        color: white;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 75px;
+
+        box-shadow:
+            0 20px 45px rgba(25, 118, 210, 0.28);
+    }
+
+    .floating-card {
+        position: absolute;
+
+        background: white;
+        border-radius: 16px;
+
+        padding: 15px 20px;
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        box-shadow: 0 12px 35px rgba(31, 75, 112, 0.12);
+
+        color: #263f55;
+        font-weight: bold;
+
+        min-width: 180px;
+    }
+
+    .floating-icon {
+        width: 42px;
+        height: 42px;
+
+        border-radius: 12px;
+
+        background: #eaf5ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 21px;
+    }
+
+    .card-one {
+        top: 50px;
+        right: 20px;
+    }
+
+    .card-two {
+        bottom: 65px;
+        left: 5px;
+    }
+
+    .card-three {
+        bottom: 15px;
+        right: 70px;
+    }
+
+
+    /* =========================
+       FEATURES
+    ========================== */
+
+    .features {
+        width: 100%;
+        max-width: 1250px;
+
+        margin: auto;
+        padding: 30px 30px 80px;
+    }
+
+    .features-title {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .features-title h2 {
+        margin: 0 0 10px;
+        color: #102a43;
+        font-size: 32px;
+    }
+
+    .features-title p {
+        margin: 0;
+        color: #718096;
+        font-size: 16px;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+    }
+
+    .feature-card {
+        background: white;
+
+        border: 1px solid #e5eef5;
+        border-radius: 20px;
+
+        padding: 30px;
+
+        text-align: center;
+
+        box-shadow: 0 12px 35px rgba(31, 75, 112, 0.06);
+
+        transition: 0.2s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 45px rgba(31, 75, 112, 0.10);
+    }
+
+    .feature-card .feature-icon {
+        width: 65px;
+        height: 65px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 18px;
+
+        background: #eaf5ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 30px;
+    }
+
+    .feature-card h3 {
+        margin: 0 0 12px;
+        color: #173b5e;
+        font-size: 20px;
+    }
+
+    .feature-card p {
+        margin: 0;
+        color: #718096;
+        line-height: 1.9;
+        font-size: 15px;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    .home-footer {
+        border-top: 1px solid #e5eef5;
+
+        text-align: center;
+
+        padding: 25px;
+
+        color: #718096;
+        font-size: 14px;
+
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================== */
+
+    @media (max-width: 900px) {
+
+        .home-nav {
+            padding: 18px 20px 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .home-nav-links {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            margin-top: 6px;
+        }
+
+        .home-nav-links .home-nav-link {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            box-sizing: border-box;
+        }
+
+        .home-nav-link {
+            padding: 8px 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .hero {
+            grid-template-columns: 1fr;
+            text-align: center;
+            padding: 45px 20px 60px;
+            gap: 30px;
+        }
+
+        .hero-content {
+            margin: auto;
+        }
+
+        .hero-buttons {
+            justify-content: center;
+        }
+
+        .hero-title {
+            font-size: 43px;
+        }
+
+        .hero-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-visual {
+            min-height: 390px;
+        }
+
+        .medical-circle {
+            width: 290px;
+            height: 290px;
+        }
+
+        .medical-icon {
+            width: 125px;
+            height: 125px;
+            font-size: 60px;
+        }
+
+        .card-one {
+            top: 10px;
+            right: 0;
+        }
+
+        .card-two {
+            bottom: 35px;
+            left: 0;
+        }
+
+        .card-three {
+            bottom: 0;
+            right: 50px;
+        }
+
+        .features {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
+    @media (max-width: 500px) {
+
+        .home-nav {
+            padding: 12px 10px;
+            gap: 8px;
+        }
+
+        .home-brand-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 21px;
+        }
+
+        .home-brand-name {
+            font-size: 19px;
+        }
+
+        .home-nav-links {
+            gap: 4px;
+        }
+
+        .home-nav-link {
+            padding: 7px 8px;
+            font-size: 11px;
+        }
+
+        .hero-title {
+            font-size: 35px;
+        }
+
+        .hero-description {
+            font-size: 16px;
+        }
+
+        .hero-button {
+            width: 100%;
+        }
+
+        .medical-circle {
+            width: 240px;
+            height: 240px;
+        }
+
+        .medical-icon {
+            width: 105px;
+            height: 105px;
+            font-size: 50px;
+        }
+
+        .floating-card {
+            min-width: auto;
+            padding: 10px 13px;
+            font-size: 13px;
+        }
+
+        .floating-icon {
+            width: 35px;
+            height: 35px;
+            font-size: 17px;
+        }
+
+        .card-one {
+            right: -5px;
+        }
+
+        .card-two {
+            left: -5px;
+        }
+
+        .card-three {
+            right: 25px;
+        }
+    }
+
+</style>
+
+<style id="home-logout-visible-fix">
+.home-nav .home-nav-links .home-nav-logout-form {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 999999 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.home-nav .home-nav-links .home-nav-logout {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 120px !important;
+    min-height: 40px !important;
+    border: 0 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 999999 !important;
+    background: #1976d2 !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+}
+
+@media (max-width: 600px) {
+    .home-nav {
+        flex-wrap: wrap !important;
+    }
+
+    .home-nav .home-nav-links {
+        width: 100% !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        justify-content: center !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        overflow: visible !important;
+        position: relative !important;
+        z-index: 999999 !important;
+    }
+
+    .home-nav .home-nav-logout-form {
+        width: auto !important;
+        flex: 0 0 auto !important;
+    }
+
+    .home-nav .home-nav-logout {
+        width: auto !important;
+        min-width: 150px !important;
+        padding: 10px 18px !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+}
+</style>
+
+
+
+<div class="home-page">
+
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
+    <nav class="home-nav">
+
+        <a
+            href="{% url 'home' %}"
+            class="home-brand"
+        >
+
+            <div class="home-brand-icon">
+                🩺
+            </div>
+
+            <div class="home-brand-name">
+                MY DOCTOR
+            </div>
+
+        </a>
+
+
+        <div class="home-nav-links">
+            {% if request.user.is_authenticated %}
+
+            {% else %}
+
+                <a
+                    href="{% url 'login' %}"
+                    class="home-nav-link"
+                >
+                    تسجيل الدخول
+                </a>
+
+                <a
+                    href="{% url 'register' %}"
+                    class="home-nav-link home-nav-login"
+                >
+                    إنشاء حساب
+                </a>
+
+            {% endif %}
+        </div>
+
+    </nav>
+
+
+    <!-- =========================
+         HERO
+    ========================== -->
+
+    <main>
+
+        <section class="hero">
+
+
+            <div class="hero-content">
+
+                <div class="hero-badge">
+                    🩺 منصة MY DOCTOR الطبية
+                </div>
+
+
+                <h1 class="hero-title">
+
+                    صحتك أولاً
+
+                    <br>
+
+                    <span>
+                        ونحن نهتم بك
+                    </span>
+
+                </h1>
+
+
+                <p class="hero-description">
+
+                    منصة طبية تساعدك على التواصل مع الأطباء،
+                    حجز المواعيد، متابعة حجوزاتك،
+                    واستقبال الإشعارات والرسائل بسهولة
+                    من مكان واحد.
+
+                </p>
+
+
+                <div class="hero-buttons">
+
+                    <a
+                        href="{% url 'register' %}"
+                        class="hero-button register-button-home"
+                    >
+                        ✨ إنشاء حساب جديد
+                    </a>
+
+
+                    <a
+                        href="{% url 'login' %}"
+                        class="hero-button login-button-home"
+                    >
+                        🔐 تسجيل الدخول
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-visual">
+
+                <div class="medical-circle">
+
+                    <div class="medical-icon">
+                        🩺
+                    </div>
+
+                </div>
+
+
+                <div class="floating-card card-one">
+
+                    <div class="floating-icon">
+                        👨‍⚕️
+                    </div>
+
+                    <span>
+                        أطباء متخصصون
+                    </span>
+
+                </div>
+
+
+                <div class="floating-card card-two">
+
+                    <div class="floating-icon">
+                        📅
+                    </div>
+
+                    <span>
+                        حجز المواعيد
+                    </span>
+
+                </div>
+
+
+                <div class="floating-card card-three">
+
+                    <div class="floating-icon">
+                        🔔
+                    </div>
+
+                    <span>
+                        إشعارات فورية
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             FEATURES
+        ========================== -->
+
+        <section class="features">
+
+            <div class="features-title">
+
+                <h2>
+                    كل ما تحتاجه في مكان واحد
+                </h2>
+
+                <p>
+                    تجربة طبية بسيطة وسريعة ومنظمة
+                </p>
+
+            </div>
+
+
+            <div class="features-grid">
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        👨‍⚕️
+                    </div>
+
+                    <h3>
+                        تواصل مع الأطباء
+                    </h3>
+
+                    <p>
+                        تواصل مباشرة مع طبيبك
+                        وتابع محادثاتك بسهولة.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        📅
+                    </div>
+
+                    <h3>
+                        حجز المواعيد
+                    </h3>
+
+                    <p>
+                        اختر اليوم والساعة المناسبة
+                        من المواعيد المتاحة للطبيب.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        🔔
+                    </div>
+
+                    <h3>
+                        إشعارات فورية
+                    </h3>
+
+                    <p>
+                        استقبل إشعارات عند وجود
+                        رسائل أو تحديثات جديدة على حجوزاتك.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="home-footer">
+
+        © {% now "Y" %} MY DOCTOR — منصتك الطبية
+
+    </footer>
+
+
+</div>
+
+{% endblock %}

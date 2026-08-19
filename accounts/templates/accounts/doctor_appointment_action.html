@@ -1,0 +1,10 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ action_title }} - MY DOCTOR{% endblock %}
+{% block extra_css %}
+<style>
+.action-page{max-width:650px;margin:40px auto;padding:20px}
+.action-card{background:#fff;border-radius:18px;padding:28px;box-shadow:0 8px 30px rgba(15,23,42,.08);text-align:center}
+.action-card h2{margin:0 0 18px;color:#0f172a}.info{background:#f8fafc;border-radius:12px;padding:15px;margin-bottom:20px;line-height:2;color:#475569}
+.action-form{display:grid;gap:10px}.action-btn,.back-btn{display:block;width:100%;box-sizing:border-box;border:0;border-radius:10px;padding:13px;text-decoration:none;font-weight:900;cursor:pointer}.action-btn{background:#0d6efd;color:#fff}.back-btn{background:#e2e8f0;color:#334155}
+</style>{% endblock %}
+{% block content %}<div class="action-page"><div class="action-card"><h2>{{ action_title }}</h2><div class="info"><strong>المريض:</strong> {{ appointment.patient.get_full_name|default:appointment.patient.username }}<br><strong>التاريخ:</strong> {{ appointment.date|date:'Y-m-d' }}<br><strong>الوقت:</strong> {{ appointment.time|time:'h:i A' }}</div><form method="POST" class="action-form">{% csrf_token %}<button class="action-btn" type="submit">تأكيد {{ action_title }}</button><a class="back-btn" href="{% url 'doctor_appointments' %}">رجوع للحجوزات</a></form></div></div>{% endblock %}

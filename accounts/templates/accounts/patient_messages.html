@@ -1,0 +1,259 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    رسائلي | MY DOCTOR
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.messages-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 35px 20px;
+}
+
+.messages-header {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 7px 25px rgba(0,0,0,0.06);
+}
+
+.messages-header h1 {
+    margin: 0 0 8px;
+    color: #087f8c;
+}
+
+.messages-header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.messages-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(280px, 1fr));
+    gap: 22px;
+}
+
+.message-card {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 7px 25px rgba(0,0,0,0.06);
+    transition: 0.2s;
+}
+
+.message-card:hover {
+    transform: translateY(-3px);
+}
+
+.message-top {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.message-icon {
+    width: 55px;
+    height: 55px;
+    min-width: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: #eef5ff;
+    font-size: 28px;
+}
+
+.message-card h2 {
+    margin: 0;
+    color: #087f8c;
+}
+
+.message-content {
+    color: #475569;
+    line-height: 1.8;
+    margin: 15px 0 8px;
+}
+
+.message-date {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.unread-count {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.chat-button {
+    display: block;
+    margin-top: 18px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #087f8c;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.chat-button:hover {
+    background: #066d77;
+    transform: translateY(-2px);
+}
+
+.empty-message {
+    grid-column: 1 / -1;
+    background: white;
+    border-radius: 18px;
+    padding: 45px 25px;
+    text-align: center;
+    box-shadow: 0 7px 25px rgba(0,0,0,0.06);
+}
+
+.empty-message .message-icon {
+    margin: 0 auto 15px;
+    font-size: 55px;
+}
+
+.empty-message h2 {
+    color: #087f8c;
+}
+
+.empty-message p {
+    color: #64748b;
+}
+
+@media (max-width: 800px) {
+
+    .messages-page {
+        padding: 20px 12px;
+    }
+
+    .messages-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="messages-page">
+
+    <div class="messages-header">
+
+        <h1>
+            💬 رسائلي
+        </h1>
+
+        <p>
+            جميع محادثاتك مع الأطباء
+        </p>
+
+    </div>
+
+
+    <div class="messages-grid">
+
+        {% for conversation in conversations %}
+
+            <div class="message-card">
+
+                <div class="message-top">
+
+                    <div class="message-icon">
+                        👨‍⚕️
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            د.
+                            {{ conversation.user.get_full_name|default:conversation.user.username }}
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p class="message-content">
+
+                    {{ conversation.last_message.content }}
+
+                </p>
+
+
+                <small class="message-date">
+
+                    {{ conversation.last_message.created_at|date:"Y-m-d H:i" }}
+
+                </small>
+
+
+                {% if conversation.unread_count > 0 %}
+
+                    <div class="unread-count">
+
+                        {{ conversation.unread_count }}
+                        رسالة جديدة
+
+                    </div>
+
+                {% endif %}
+
+
+                <a
+                    href="{% url 'chat' conversation.user.my_doctor_profile.id %}"
+                    class="chat-button"
+                >
+
+                    💬 فتح المحادثة
+
+                </a>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-message">
+
+                <div class="message-icon">
+                    📭
+                </div>
+
+                <h2>
+                    لا توجد محادثات
+                </h2>
+
+                <p>
+                    لم تبدأ أي محادثة مع طبيب حتى الآن.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

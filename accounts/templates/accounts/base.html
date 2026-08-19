@@ -1,0 +1,843 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#087f8c"
+    >
+
+    <title>
+        {% block title %}
+            MY DOCTOR
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'accounts/style.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'accounts/premium.css' %}"
+    >
+
+    <style>
+
+        /* =================================================
+           FIXED NAVBAR
+        ================================================= */
+
+        .site-header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+        }
+
+
+        /* =================================================
+           PAGE SPACE UNDER NAVBAR
+        ================================================= */
+
+        .site-main {
+            padding-top: 90px;
+        }
+
+
+        /* =================================================
+           LOGOUT BUTTON
+        ================================================= */
+
+        .navbar-user form {
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-logout {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+    </style>
+
+
+    {% block extra_css %}
+    {% endblock %}
+
+</head>
+
+
+<body class="{% block body_class %}{% endblock %}">
+
+
+{% if request.user.is_authenticated %}
+
+<header class="site-header">
+
+    <nav class="main-navbar">
+
+
+        <!-- =================================================
+             LOGO
+        ================================================== -->
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="navbar-logo"
+        >
+
+            <span class="navbar-logo-icon">
+                🩺
+            </span>
+
+            <span class="navbar-logo-text">
+                MY DOCTOR
+            </span>
+
+        </a>
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <div class="navbar-links">
+
+
+            <!-- HOME -->
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="navbar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🏠
+                </span>
+
+                <span>
+                    الرئيسية
+                </span>
+
+            </a>
+
+
+            {% if request.user.role == "PATIENT" %}
+
+
+                <!-- DOCTORS -->
+
+                <a
+                    href="{% url 'doctors' %}"
+                    class="navbar-link {% if request.resolver_match.url_name == 'doctors' or request.resolver_match.url_name == 'book_appointment' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        👨‍⚕️
+                    </span>
+
+                    <span>
+                        الأطباء
+                    </span>
+
+                </a>
+
+
+                <!-- APPOINTMENTS -->
+
+                <a
+                    href="{% url 'my_appointments' %}"
+                    class="navbar-link {% if request.resolver_match.url_name == 'my_appointments' or request.resolver_match.url_name == 'cancel_appointment' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        📅
+                    </span>
+
+                    <span>
+                        مواعيدي
+                    </span>
+
+                </a>
+
+
+                <!-- MESSAGES -->
+
+                <a
+                    href="{% url 'patient_messages' %}"
+                    class="navbar-link {% if request.resolver_match.url_name == 'patient_messages' or request.resolver_match.url_name == 'chat' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        💬
+                    </span>
+
+                    <span>
+                        الرسائل
+                    </span>
+
+                </a>
+
+
+            {% endif %}
+
+
+            {% if request.user.role == "DOCTOR" %}
+
+
+                <!-- DOCTOR APPOINTMENTS -->
+
+                <a
+                    href="{% url 'doctor_appointments' %}"
+                    class="navbar-link {% if request.resolver_match.url_name == 'doctor_appointments' or request.resolver_match.url_name == 'update_appointment_status' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        📅
+                    </span>
+
+                    <span>
+                        الحجوزات
+                    </span>
+
+                </a>
+
+
+                <!-- DOCTOR MESSAGES -->
+
+                <a
+                    href="{% url 'doctor_messages' %}"
+                    class="navbar-link {% if request.resolver_match.url_name == 'doctor_messages' or request.resolver_match.url_name == 'doctor_chat' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        💬
+                    </span>
+
+                    <span>
+                        الرسائل
+                    </span>
+
+                </a>
+
+
+                <!-- DOCTOR SCHEDULE -->
+
+                <a
+                    href="{% url 'doctor_schedule' %}"
+                    class="navbar-link {% if request.resolver_match.url_name == 'doctor_schedule' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        🕐
+                    </span>
+
+                    <span>
+                        جدول العمل
+                    </span>
+
+                </a>
+
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 NOTIFICATIONS
+            ================================================== -->
+
+            <a
+                href="{% url 'notifications' %}"
+                class="navbar-link notification-nav-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🔔
+                </span>
+
+                <span>
+                    الإشعارات
+                </span>
+
+
+                {% if unread_count > 0 %}
+
+                    <span class="navbar-badge">
+                        {{ unread_count }}
+                    </span>
+
+                {% endif %}
+
+            </a>
+
+
+        </div>
+
+
+        <!-- =================================================
+             USER
+        ================================================== -->
+
+        <div class="navbar-user">
+
+
+            <div class="navbar-user-avatar">
+                👤
+            </div>
+
+
+            <div class="navbar-user-info">
+
+                <strong>
+
+                    {% if request.user.get_full_name %}
+
+                        {{ request.user.get_full_name }}
+
+                    {% else %}
+
+                        {{ request.user.username }}
+
+                    {% endif %}
+
+                </strong>
+
+
+                <span>
+
+                    {% if request.user.role == "DOCTOR" %}
+
+                        طبيب
+
+                    {% else %}
+
+                        مريض
+
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 REAL LOGOUT
+            ================================================== -->
+
+            <form
+                method="POST"
+                action="{% url 'logout' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="navbar-logout"
+                >
+                    تسجيل الخروج
+                </button>
+
+            </form>
+
+
+        </div>
+
+
+    </nav>
+
+</header>
+
+{% endif %}
+
+
+<!-- =====================================================
+     PAGE CONTENT
+====================================================== -->
+
+<main class="site-main">
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+
+<!-- =====================================================
+     AUTHENTICATED FOOTER
+====================================================== -->
+
+{% if request.user.is_authenticated %}
+
+<footer class="site-footer">
+
+    <div class="footer-content">
+
+
+        <div class="footer-brand">
+
+            <div class="footer-logo">
+                🩺 MY DOCTOR
+            </div>
+
+            <p>
+                منصة بسيطة وآمنة لإدارة المواعيد
+                والتواصل بين الطبيب والمريض.
+            </p>
+
+        </div>
+
+
+        <div class="footer-copy">
+
+            <span>
+                © {% now "Y" %} MY DOCTOR
+            </span>
+
+            <span>
+                جميع الحقوق محفوظة
+            </span>
+
+        </div>
+
+
+    </div>
+
+</footer>
+
+{% endif %}
+
+
+{% block extra_js %}
+{% endblock %}
+
+
+<!-- =====================================================
+     GLOBAL SCROLL POSITION
+     يحافظ على مكان المستخدم بعد أي Reload / POST
+====================================================== -->
+
+<script>
+
+(function () {
+
+    const SCROLL_KEY = "my_doctor_scroll_position";
+
+
+    /* =====================================================
+       SAVE
+    ===================================================== */
+
+    function saveScrollPosition() {
+
+        try {
+
+            const position =
+                window.scrollY ||
+                window.pageYOffset ||
+                0;
+
+            sessionStorage.setItem(
+                SCROLL_KEY,
+                String(position)
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "Could not save scroll position:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       RESTORE
+    ===================================================== */
+
+    function restoreScrollPosition() {
+
+        try {
+
+            const savedPosition =
+                sessionStorage.getItem(
+                    SCROLL_KEY
+                );
+
+
+            if (
+                savedPosition === null ||
+                savedPosition === ""
+            ) {
+                return;
+            }
+
+
+            const position =
+                parseInt(
+                    savedPosition,
+                    10
+                );
+
+
+            if (
+                Number.isNaN(position)
+            ) {
+                return;
+            }
+
+
+            /*
+             * أول محاولة بعد رسم الصفحة
+             */
+
+            window.requestAnimationFrame(
+                function () {
+
+                    window.scrollTo(
+                        0,
+                        position
+                    );
+
+                }
+            );
+
+
+            /*
+             * محاولة ثانية بعد تحميل المحتوى
+             */
+
+            setTimeout(
+                function () {
+
+                    window.scrollTo(
+                        0,
+                        position
+                    );
+
+                },
+                50
+            );
+
+
+            /*
+             * محاولة ثالثة للتأكد
+             */
+
+            setTimeout(
+                function () {
+
+                    window.scrollTo(
+                        0,
+                        position
+                    );
+
+                },
+                200
+            );
+
+
+        } catch (error) {
+
+            console.warn(
+                "Could not restore scroll position:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       BEFORE RELOAD
+    ===================================================== */
+
+    window.addEventListener(
+        "beforeunload",
+        function () {
+
+            saveScrollPosition();
+
+        }
+    );
+
+
+    /* =====================================================
+       CLICK
+       يحفظ المكان قبل تنفيذ أي رابط أو زر
+    ===================================================== */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const clickable =
+                event.target.closest(
+                    "a, button, input[type='submit'], input[type='button']"
+                );
+
+
+            if (!clickable) {
+                return;
+            }
+
+
+            if (clickable.disabled) {
+                return;
+            }
+
+
+            saveScrollPosition();
+
+        },
+        true
+    );
+
+
+    /* =====================================================
+       FORM SUBMIT
+    ===================================================== */
+
+    document.addEventListener(
+        "submit",
+        function () {
+
+            saveScrollPosition();
+
+        },
+        true
+    );
+
+
+    /* =====================================================
+       PAGE LOAD
+    ===================================================== */
+
+    window.addEventListener(
+        "load",
+        function () {
+
+            restoreScrollPosition();
+
+        }
+    );
+
+
+    /* =====================================================
+       DOM READY
+    ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            setTimeout(
+                function () {
+
+                    restoreScrollPosition();
+
+                },
+                100
+            );
+
+        }
+    );
+
+
+})();
+
+</script>
+
+
+<!-- =====================================================
+     GLOBAL AUTO REFRESH
+     تحديث البرنامج بالكامل كل ثانية مع الحفاظ على
+     مكان المستخدم وبيانات الحقول غير الحساسة
+====================================================== -->
+
+<script>
+(function () {
+
+    const AUTO_REFRESH_KEY = "my_doctor_auto_refresh_state";
+    const AUTO_REFRESH_INTERVAL = 5000;
+
+    function savePageState() {
+        try {
+            const state = {
+                scrollX: window.scrollX || 0,
+                scrollY: window.scrollY || window.pageYOffset || 0,
+                url: window.location.href,
+                fields: []
+            };
+
+            document.querySelectorAll(
+                "input:not([type='password']):not([type='file']), textarea, select"
+            ).forEach(function (field) {
+
+                if (!field.name && !field.id) {
+                    return;
+                }
+
+                state.fields.push({
+                    name: field.name || "",
+                    id: field.id || "",
+                    type: field.type || "",
+                    value: field.value,
+                    checked: !!field.checked
+                });
+            });
+
+            sessionStorage.setItem(
+                AUTO_REFRESH_KEY,
+                JSON.stringify(state)
+            );
+
+        } catch (error) {}
+    }
+
+
+    function restorePageState() {
+        try {
+            const raw = sessionStorage.getItem(AUTO_REFRESH_KEY);
+
+            if (!raw) {
+                return;
+            }
+
+            const state = JSON.parse(raw);
+
+            if (!state || state.url !== window.location.href) {
+                return;
+            }
+
+            if (Array.isArray(state.fields)) {
+                state.fields.forEach(function (saved) {
+
+                    let field = null;
+
+                    if (saved.id) {
+                        field = document.getElementById(saved.id);
+                    }
+
+                    if (!field && saved.name) {
+                        field = document.querySelector(
+                            "[name='" +
+                            CSS.escape(saved.name) +
+                            "']"
+                        );
+                    }
+
+                    if (!field) {
+                        return;
+                    }
+
+                    if (
+                        saved.type === "checkbox" ||
+                        saved.type === "radio"
+                    ) {
+                        field.checked = !!saved.checked;
+                    } else {
+                        field.value = saved.value ?? "";
+                    }
+
+                    field.dispatchEvent(
+                        new Event("input", { bubbles: true })
+                    );
+
+                    field.dispatchEvent(
+                        new Event("change", { bubbles: true })
+                    );
+                });
+            }
+
+            requestAnimationFrame(function () {
+                window.scrollTo(
+                    Number(state.scrollX || 0),
+                    Number(state.scrollY || 0)
+                );
+
+                setTimeout(function () {
+                    window.scrollTo(
+                        Number(state.scrollX || 0),
+                        Number(state.scrollY || 0)
+                    );
+                }, 80);
+            });
+
+        } catch (error) {}
+    }
+
+
+    function prepareForRefresh() {
+        savePageState();
+    }
+
+
+    window.addEventListener(
+        "beforeunload",
+        prepareForRefresh
+    );
+
+
+    /*
+     * استرجاع الحالة بعد تحميل الصفحة.
+     * لا نلمس كلمات المرور أو الملفات.
+     */
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            restorePageState,
+            { once: true }
+        );
+    } else {
+        restorePageState();
+    }
+
+
+    /*
+     * تحديث البرنامج بالكامل كل ثانية.
+     *
+     * أثناء كتابة/اختيار شيء جديد نحفظ حالته أولاً،
+     * وبعد إعادة التحميل يتم استرجاعه تلقائيًا.
+     */
+    setInterval(function () {
+
+        /*
+         * لو التبويب غير ظاهر، لا نستهلك Reloads بدون داعٍ.
+         * أول ما يرجع المستخدم للبرنامج سيستمر التحديث.
+         */
+        if (document.visibilityState !== "visible") {
+            return;
+        }
+
+        prepareForRefresh();
+
+        window.location.reload();
+
+    }, AUTO_REFRESH_INTERVAL);
+
+})();
+</script>
+
+</body>
+
+</html>

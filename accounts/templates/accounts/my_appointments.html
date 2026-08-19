@@ -1,0 +1,1995 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    مواعيدي - MY DOCTOR
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-top-bar{
+    max-width:1200px;margin:0 auto 10px;padding:15px 20px;
+    display:flex;align-items:center;justify-content:center;
+    background:#fff;border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+    position:sticky;top:90px;z-index:1000;
+}
+.appointment-tabs{
+    max-width:1200px;margin:0 auto 10px;padding:6px;
+    display:grid;grid-template-columns:1fr 1fr;gap:6px;
+    background:#e2e8f0;border-radius:13px;
+    position:sticky;top:161px;z-index:999;
+}
+.appointment-tab{
+    display:block;padding:13px 10px;border-radius:10px;
+    color:#475569;text-decoration:none;text-align:center;font-weight:800;
+}
+.appointment-tab.active{background:#0d6efd;color:#fff}
+.appointment-tab.follow-up.active{background:#7c3aed;color:#fff}
+
+.booking-status-tabs{
+    max-width:1200px;margin:0 auto 10px;padding:6px;
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;
+    background:#f1f5f9;border-radius:13px;
+    position:sticky;top:224px;z-index:998;
+}
+.booking-status-tab{
+    display:block;padding:12px 8px;border-radius:10px;
+    text-decoration:none;text-align:center;font-weight:800;
+}
+.booking-status-tab.pending{color:#92400e}
+.booking-status-tab.pending.active{background:#fff7ed;color:#c2410c}
+.booking-status-tab.accepted{color:#047857}
+.booking-status-tab.accepted.active{background:#ecfdf5;color:#047857}
+.booking-status-tab.rejected{color:#b91c1c}
+.booking-status-tab.rejected.active{background:#fef2f2;color:#b91c1c}
+
+.dashboard-header{
+    max-width:1200px;margin:0 auto 12px;padding:16px 20px;
+    background:#fff;border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08)
+}
+.dashboard-header p{margin:0;color:#64748b;text-align:center}
+
+.next-panel{
+    max-width:1200px;margin:0 auto 12px;padding:14px 16px;
+    background:#fff;border-radius:15px;
+    box-shadow:0 5px 18px rgba(15,23,42,.05)
+}
+.next-panel.normal{border:1px solid #dbe3ee}
+.next-panel.follow{border:1px solid #ddd6fe}
+.next-title{
+    margin-bottom:9px;text-align:right;font-size:16px;font-weight:900
+}
+.next-panel.normal .next-title{color:#0f172a}
+.next-panel.follow .next-title{color:#5b21b6}
+.next-grid{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px
+}
+.next-item{padding:10px 9px;border-radius:10px;text-align:center}
+.next-panel.normal .next-item{background:#f8fafc}
+.next-panel.follow .next-item{background:#faf5ff}
+.next-label{display:block;margin-bottom:4px;font-size:10px;font-weight:800}
+.next-panel.normal .next-label{color:#64748b}
+.next-panel.follow .next-label{color:#7c3aed}
+.next-value{display:block;color:#0f172a;font-size:12px;font-weight:900;line-height:1.6}
+.next-details{margin-top:8px;text-align:right}
+.next-status{
+    margin-top:9px;padding:9px;border-radius:9px;text-align:center;
+    font-size:11px;font-weight:900
+}
+.next-panel.normal .next-status{background:#ecfdf5;color:#047857}
+.next-panel.follow .next-status{background:#f5f3ff;color:#6d28d9}
+.next-chat{
+    display:block;width:100%;margin-top:9px;padding:11px;box-sizing:border-box;
+    border-radius:9px;color:#fff;text-decoration:none;text-align:center;font-weight:800
+}
+.next-panel.normal .next-chat{background:#0d6efd}
+.next-panel.follow .next-chat{background:#7c3aed}
+
+.day-selector{
+    max-width:1200px;margin:0 auto 12px;padding:10px;
+    background:#fff;border:1px solid #e2e8f0;border-radius:14px;
+    box-shadow:0 5px 18px rgba(15,23,42,.05)
+}
+.day-selector-title{
+    margin-bottom:8px;text-align:center;color:#0f172a;font-size:13px;font-weight:900
+}
+.day-strip{
+    display:flex;gap:7px;overflow-x:auto;padding:2px;scrollbar-width:thin
+}
+.day-strip::-webkit-scrollbar{height:6px}
+.day-strip::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px}
+.day-btn{
+    flex:0 0 96px;min-width:96px;border:1px solid #dbe3ee;
+    border-radius:10px;padding:8px 6px;background:#f8fafc;color:#475569;
+    cursor:pointer;font-size:10px;font-weight:900
+}
+.day-btn strong,.day-btn span{display:block}
+.day-btn span{margin-top:3px;font-weight:700}
+.day-btn.active{background:#0d6efd;color:#fff;border-color:#0d6efd}
+.follow-day-btn.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+
+.day-date-search{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px solid #eef2f7;
+}
+.day-date-search input{
+    flex:1;
+    min-width:0;
+    box-sizing:border-box;
+    border:1px solid #dbe3ee;
+    border-radius:9px;
+    background:#f8fafc;
+    color:#334155;
+    padding:9px 10px;
+    font-size:12px;
+    font-weight:800;
+    outline:none;
+}
+.day-date-search input:focus{
+    border-color:#0d6efd;
+    background:#fff;
+}
+.day-date-search button{
+    border:0;
+    border-radius:9px;
+    padding:9px 12px;
+    background:#0d6efd;
+    color:#fff;
+    font-size:11px;
+    font-weight:900;
+    cursor:pointer;
+    white-space:nowrap;
+}
+.follow-day-search button{background:#7c3aed}
+.day-date-clear{background:#64748b !important}
+@media(max-width:700px){
+    .day-date-search{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        gap:6px;
+    }
+    .day-date-search input{
+        width:100%;
+        min-width:0;
+        font-size:11px;
+        padding:9px 8px;
+    }
+    .day-date-search button{
+        font-size:10px;
+        padding:9px 9px;
+    }
+    .day-date-search .day-date-clear{
+        grid-column:1 / -1;
+        width:100%;
+    }
+}
+
+.table-shell{
+    max-width:1200px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;
+    border-radius:15px;box-shadow:0 5px 18px rgba(15,23,42,.05);overflow:hidden
+}
+.table-title{
+    padding:13px 15px;background:#fbfdff;border-bottom:1px solid #eef2f7;
+    color:#0f172a;font-weight:900
+}
+.table-wrap{overflow-x:auto}
+.appointments-table{width:100%;min-width:950px;border-collapse:collapse}
+.appointments-table th{
+    padding:12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;
+    color:#475569;font-size:11px;font-weight:900;text-align:right;white-space:nowrap
+}
+.appointments-table td{
+    padding:13px 11px;vertical-align:top;color:#334155;font-size:11px
+}
+.appointments-table tbody tr{position:relative}
+.appointments-table tbody tr:not(:last-child)::after{
+    content:"";position:absolute;right:4%;left:4%;bottom:0;height:1px;
+    background:linear-gradient(to left,transparent,#dbe3ee 18%,#cbd5e1 50%,#dbe3ee 82%,transparent)
+}
+.follow-up-table tbody tr:not(:last-child)::after{
+    background:linear-gradient(to left,transparent,#ddd6fe 18%,#c4b5fd 50%,#ddd6fe 82%,transparent)
+}
+.doctor-name{color:#0f172a;font-weight:900}
+.notes-cell{max-width:230px;color:#64748b;line-height:1.7}
+
+.status{
+    display:inline-block;padding:7px 9px;border-radius:8px;
+    font-size:10px;font-weight:900;white-space:nowrap
+}
+.status.pending{background:#fff3cd;color:#856404}
+.status.accepted{background:#d1e7dd;color:#146c43}
+.status.rejected{background:#f8d7da;color:#842029}
+.status.cancelled{background:#e2e3e5;color:#41464b}
+.status.waiting{background:#fff7ed;color:#c2410c}
+.status.attended{background:#ecfdf5;color:#047857}
+.status.absent{background:#f1f5f9;color:#475569}
+
+.actions{display:grid;gap:6px}
+.chat-button,.cancel-button,.doctors-button{
+    display:block;width:100%;box-sizing:border-box;text-decoration:none;text-align:center
+}
+.chat-button{
+    margin-top:0;padding:8px 10px;border-radius:8px;background:#0d6efd;
+    color:#fff;font-size:10px;font-weight:900
+}
+.cancel-form{margin:0}
+.cancel-button{
+    padding:8px 10px;border:none;border-radius:8px;background:#dc3545;
+    color:#fff;font-size:10px;font-weight:900;cursor:pointer
+}
+
+.rating-box{
+    margin-top:8px;padding:9px;background:#fffbeb;border:1px solid #fde68a;
+    border-radius:9px
+}
+.rating-title{
+    margin-bottom:7px;color:#92400e;text-align:center;font-size:10px;font-weight:900
+}
+.rating-select,.rating-comment{
+    width:100%;box-sizing:border-box;border:1px solid #f59e0b;
+    border-radius:7px;background:#fff
+}
+.rating-select{padding:7px;font-size:10px}
+.rating-comment{min-height:55px;margin-top:6px;padding:7px;resize:vertical;font-size:10px}
+.rating-button{
+    width:100%;margin-top:6px;padding:8px;border:0;border-radius:7px;
+    background:#f59e0b;color:#fff;cursor:pointer;font-size:10px;font-weight:900
+}
+.rating-done{
+    padding:8px;border-radius:8px;background:#ecfdf5;color:#047857;
+    text-align:center;font-size:10px;font-weight:900
+}
+.empty-box{
+    padding:35px 20px;background:#fff;border-radius:14px;text-align:center;color:#64748b
+}
+.empty-day{
+    max-width:1200px;margin:10px auto 0;padding:20px;background:#fff;
+    border:1px dashed #cbd5e1;border-radius:12px;color:#94a3b8;text-align:center
+}
+.follow-alert{
+    max-width:1200px;margin:0 auto 12px;padding:12px 14px;
+    background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;
+    color:#5b21b6;font-weight:800;text-align:center
+}
+@media(max-width:700px){
+    .page-top-bar,.appointment-tabs,.booking-status-tabs{margin-left:10px;margin-right:10px}
+    .next-grid{grid-template-columns:1fr 1fr}
+}
+
+/* =========================================================
+   PATIENT FIXED CONTROLS
+========================================================= */
+.patient-fixed-controls{
+    position:sticky;
+    top:90px;
+    z-index:1200;
+    padding:6px 0 10px;
+    background:rgba(248,250,252,.97);
+    backdrop-filter:blur(8px);
+}
+.patient-fixed-controls .appointment-tabs,
+.patient-fixed-controls .booking-status-tabs,
+.patient-fixed-controls .day-selector,
+.patient-fixed-controls .next-panel{
+    position:relative !important;
+    top:0 !important;
+}
+.patient-fixed-controls .appointment-tabs{
+    margin-bottom:10px;
+}
+.appointment-period-tabs{
+    max-width:1200px;
+    margin:0 auto 10px;
+    padding:6px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    background:#e2e8f0;
+    border-radius:13px;
+}
+.appointment-period-tab{
+    padding:11px 8px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    color:#475569;
+    text-align:center;
+    font-weight:900;
+    cursor:pointer;
+}
+.appointment-period-tab.active{
+    background:#0d6efd;
+    color:#fff;
+}
+.appointment-period-tab.past.active{
+    background:#64748b;
+    color:#fff;
+}
+.follow-period-tabs{
+    max-width:1200px;
+    margin:0 auto 10px;
+    padding:6px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    background:#ede9fe;
+    border-radius:13px;
+}
+.follow-period-tab{
+    padding:11px 8px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    color:#5b21b6;
+    text-align:center;
+    font-weight:900;
+    cursor:pointer;
+}
+.follow-period-tab.active{
+    background:#7c3aed;
+    color:#fff;
+}
+.appointment-hidden{
+    display:none !important;
+}
+@media(max-width:700px){
+    .patient-fixed-controls{
+        top:90px;
+    }
+}
+
+
+
+/* =========================================================
+   FOLLOW-UP ACTIVE / PAST BAR - ALWAYS VISIBLE
+========================================================= */
+
+.patient-fixed-controls .patient-period-bar{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    width:100% !important;
+    min-height:52px !important;
+    margin:0 auto 10px !important;
+    padding:6px !important;
+    box-sizing:border-box !important;
+    position:relative !important;
+    z-index:1300 !important;
+    visibility:visible !important;
+    opacity:1 !important;
+}
+
+.patient-fixed-controls .patient-period-bar .follow-period-tab{
+    display:block !important;
+    min-height:38px !important;
+    visibility:visible !important;
+    opacity:1 !important;
+}
+
+
+
+/* =========================================================
+   APPOINTMENTS CARD LAYOUT
+   تحويل كل كشف من صف طويل إلى كارت مستقل
+   بدون تغيير أي بيانات أو وظائف أو روابط
+========================================================= */
+
+.appointments-table{
+    width:100% !important;
+    min-width:0 !important;
+    border-collapse:separate !important;
+    border-spacing:0 !important;
+}
+
+.appointments-table thead{
+    display:none !important;
+}
+
+.table-wrap{
+    overflow:visible !important;
+}
+
+.appointments-table tbody{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr)) !important;
+    gap:16px !important;
+    padding:8px !important;
+    box-sizing:border-box !important;
+}
+
+.appointments-table tbody tr{
+    width:100% !important;
+    min-width:0 !important;
+    display:flex;
+    flex-direction:column !important;
+    align-self:stretch !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:#fff !important;
+    border:1px solid #e2e8f0 !important;
+    border-radius:16px !important;
+    box-shadow:0 7px 22px rgba(15,23,42,.07) !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+    transition:transform .18s ease,box-shadow .18s ease !important;
+}
+
+.appointments-table tbody tr:hover{
+    transform:translateY(-2px) !important;
+    box-shadow:0 11px 28px rgba(15,23,42,.11) !important;
+}
+
+.appointments-table tbody tr:not(:last-child)::after{
+    display:none !important;
+}
+
+.appointments-table tbody tr td{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    display:flex !important;
+    align-items:flex-start !important;
+    justify-content:space-between !important;
+    gap:12px !important;
+    padding:10px 13px !important;
+    border:0 !important;
+    border-bottom:1px solid #eef2f7 !important;
+    background:#fff !important;
+    box-sizing:border-box !important;
+    text-align:right !important;
+    line-height:1.7 !important;
+    overflow-wrap:anywhere !important;
+}
+
+.appointments-table tbody tr td:last-child{
+    border-bottom:0 !important;
+}
+
+.appointments-table tbody tr td::before{
+    flex:0 0 auto !important;
+    color:#64748b !important;
+    font-size:10px !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+}
+
+.appointments-table tbody tr td:nth-child(1)::before{content:"👤" !important;}
+.appointments-table tbody tr td:nth-child(2)::before{content:"📋" !important;}
+.appointments-table tbody tr td:nth-child(3)::before{content:"📅" !important;}
+.appointments-table tbody tr td:nth-child(4)::before{content:"🕐" !important;}
+.appointments-table tbody tr td:nth-child(5)::before{content:"📝" !important;}
+.appointments-table tbody tr td:nth-child(6)::before{content:"📌" !important;}
+.appointments-table tbody tr td:nth-child(7)::before{content:"⚙️" !important;}
+.appointments-table tbody tr td:nth-child(8)::before{content:"⚙️" !important;}
+
+.appointments-table tbody tr td.actions-cell,
+.appointments-table tbody tr td:last-child{
+    display:block !important;
+    padding:12px 13px !important;
+}
+
+.appointments-table tbody tr td.actions-cell::before,
+.appointments-table tbody tr td:last-child::before{
+    display:none !important;
+}
+
+.appointments-table tbody tr td:last-child form,
+.appointments-table tbody tr td:last-child .actions,
+.appointments-table tbody tr td:last-child .attendance-actions,
+.appointments-table tbody tr td:last-child .action-buttons{
+    width:100% !important;
+}
+
+.appointments-table tbody tr td .actions,
+.appointments-table tbody tr td .attendance-actions,
+.appointments-table tbody tr td .action-buttons{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+}
+
+.appointments-table tbody tr td .action-button,
+.appointments-table tbody tr td .chat-button,
+.appointments-table tbody tr td .attendance-button,
+.appointments-table tbody tr td .follow-up-button,
+.appointments-table tbody tr td .cancel-button{
+    width:100% !important;
+    min-height:40px !important;
+    box-sizing:border-box !important;
+}
+
+.appointments-table tbody tr td .doctor-name,
+.appointments-table tbody tr td .patient-cell{
+    font-weight:900 !important;
+    color:#0f172a !important;
+}
+
+.appointments-table tbody tr td .status{
+    white-space:normal !important;
+}
+
+.appointments-table tbody tr:has(.empty-box),
+.appointments-table tbody tr:has(.day-empty),
+.appointments-table tbody tr:has(.empty-day){
+    display:block !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    overflow:visible !important;
+    transform:none !important;
+}
+
+.appointments-table tbody tr:has(.empty-box) td,
+.appointments-table tbody tr:has(.day-empty) td,
+.appointments-table tbody tr:has(.empty-day) td{
+    display:block !important;
+    border:0 !important;
+    padding:0 !important;
+}
+
+.appointments-table tbody tr:has(.empty-box) td::before,
+.appointments-table tbody tr:has(.day-empty) td::before,
+.appointments-table tbody tr:has(.empty-day) td::before{
+    display:none !important;
+}
+
+@media (max-width:700px){
+    .appointments-table tbody{
+        grid-template-columns:1fr !important;
+        gap:12px !important;
+        padding:3px !important;
+    }
+
+    .appointments-table tbody tr{
+        border-radius:14px !important;
+    }
+
+    .appointments-table tbody tr td{
+        padding:9px 11px !important;
+        gap:8px !important;
+        font-size:12px !important;
+    }
+}
+
+@media (min-width:701px) and (max-width:1050px){
+    .appointments-table tbody{
+        grid-template-columns:repeat(2,minmax(280px,1fr)) !important;
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+
+    <div class="page-top-bar">
+        <h1 class="page-title">📅 مواعيدي</h1>
+    </div>
+
+    <div class="patient-fixed-controls">
+
+    <div class="appointment-tabs">
+        <a
+            href="{% url 'my_appointments' %}?tab=appointments&status=pending"
+            class="appointment-tab {% if request.GET.tab != 'followup' %}active{% endif %}"
+        >
+            📅 الحجوزات
+        </a>
+
+        <a
+            href="{% url 'my_appointments' %}?tab=followup"
+            class="appointment-tab follow-up {% if request.GET.tab == 'followup' %}active{% endif %}"
+        >
+            🔄 إعادة الكشف
+            {% if follow_up_notifications_count %}
+                ({{ follow_up_notifications_count }})
+            {% endif %}
+        </a>
+    </div>
+
+    {% if request.GET.tab != 'followup' %}
+
+        <div class="booking-status-tabs">
+            <a
+                href="{% url 'my_appointments' %}?tab=appointments&status=pending"
+                class="booking-status-tab pending {% if request.GET.status == 'pending' or not request.GET.status %}active{% endif %}"
+            >⏳ قيد الانتظار</a>
+
+            <a
+                href="{% url 'my_appointments' %}?tab=appointments&status=accepted"
+                class="booking-status-tab accepted {% if request.GET.status == 'accepted' %}active{% endif %}"
+            >✅ تم القبول</a>
+
+            <a
+                href="{% url 'my_appointments' %}?tab=appointments&status=rejected"
+                class="booking-status-tab rejected {% if request.GET.status == 'rejected' %}active{% endif %}"
+            >❌ تم الرفض</a>
+        </div>
+
+        {% if next_appointment %}
+            <section class="next-panel normal">
+                <div class="next-title">📌 الكشف اللي عليه الدور</div>
+
+                <div class="next-grid">
+                    <div class="next-item">
+                        <span class="next-label">👨‍⚕️ الدكتور</span>
+                        <span class="next-value">
+                            د.
+                            {{ next_appointment.doctor.user.get_full_name|default:next_appointment.doctor.user.username }}
+                        </span>
+                    </div>
+
+                    <div class="next-item">
+                        <span class="next-label">🩺 التخصص</span>
+                        <span class="next-value">
+                            {{ next_appointment.doctor.specialty }}
+                        </span>
+                    </div>
+
+                    <div class="next-item">
+                        <span class="next-label">📅 التاريخ</span>
+                        <span class="next-value">
+                            {{ next_appointment.date|date:"Y-m-d" }}
+                        </span>
+                    </div>
+
+                    <div class="next-item">
+                        <span class="next-label">🕐 الساعة</span>
+                        <span class="next-value">
+                            {{ next_appointment.time|time:"h:i A" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="next-item next-details">
+                    <span class="next-label">📝 التفاصيل</span>
+                    <span class="next-value">
+                        {% if next_appointment.notes %}
+                            {{ next_appointment.notes }}
+                        {% else %}
+                            كشف عادي
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="next-status">✅ الموعد القادم المؤكد</div>
+
+                <a
+                    href="{% url 'chat' next_appointment.doctor.id %}"
+                    class="next-chat"
+                >
+                    💬 التحدث مع الطبيب
+                </a>
+            </section>
+        {% endif %}
+
+        <section class="day-selector">
+            <div class="day-selector-title">
+                📅 اختر اليوم لعرض مواعيد هذا اليوم
+            </div>
+
+            <div class="day-strip">
+                {% for day in week_days %}
+                    <button
+                        type="button"
+                        class="day-btn normal-day-btn"
+                        data-date="{{ day.date|date:'Y-m-d' }}"
+                    >
+                        <strong>{{ day.date|date:"l" }}</strong>
+                        <span>{{ day.date|date:"Y-m-d" }}</span>
+                    </button>
+                {% endfor %}
+            </div>
+
+            <div class="day-date-search">
+                <input
+                    type="date"
+                    id="normal-date-search"
+                    aria-label="البحث عن موعد بالتاريخ"
+                >
+                <button
+                    type="button"
+                    id="normal-date-search-btn"
+                >
+                    🔎 بحث بالتاريخ
+                </button>
+                <button
+                    type="button"
+                    id="normal-date-clear-btn"
+                    class="day-date-clear"
+                >
+                    مسح
+                </button>
+            </div>
+        </section>
+
+        <div class="appointment-period-tabs">
+            <button type="button" class="appointment-period-tab active" data-period="active">
+                ✅ المواعيد السارية
+            </button>
+            <button type="button" class="appointment-period-tab past" data-period="past">
+                🕘 المواعيد الفائتة
+            </button>
+        </div>
+
+        </div>
+
+        {% if request.GET.status == 'pending' or not request.GET.status %}
+
+            <div class="table-shell">
+                <div class="table-title">⏳ الحجوزات قيد الانتظار</div>
+
+                <div class="table-wrap">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>الدكتور</th>
+                                <th>التخصص</th>
+                                <th>التاريخ</th>
+                                <th>الساعة</th>
+                                <th>التفاصيل</th>
+                                <th>الحالة</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for appointment in normal_appointments %}
+                            {% if appointment.status == 'PENDING' %}
+                                <tr
+                                    class="normal-appointment-row {% if appointment.is_past_datetime %}past-appointment-row{% else %}active-appointment-row{% endif %}"
+                                    data-date="{{ appointment.date|date:'Y-m-d' }}"
+                                >
+                                    <td>
+                                        <span class="doctor-name">
+                                            د.
+                                            {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}
+                                        </span>
+                                    </td>
+
+                                    <td>{{ appointment.doctor.specialty }}</td>
+                                    <td>{{ appointment.date|date:"Y-m-d" }}</td>
+                                    <td>{{ appointment.time|time:"h:i A" }}</td>
+
+                                    <td class="notes-cell">
+                                        {% if appointment.notes %}
+                                            {{ appointment.notes }}
+                                        {% else %}
+                                            كشف عادي
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <span class="status pending">
+                                            ⏳ قيد الانتظار
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <form
+                                            method="POST"
+                                            action="{% url 'cancel_appointment' appointment.id %}"
+                                            class="cancel-form"
+                                        >
+                                            {% csrf_token %}
+                                            <button
+                                                type="submit"
+                                                class="cancel-button"
+                                                onclick="return confirm('هل أنت متأكد من إلغاء هذا الحجز؟');"
+                                            >
+                                                ❌ إلغاء الحجز
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-box">
+                                        لا توجد حجوزات.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        {% elif request.GET.status == 'accepted' %}
+
+            <div class="table-shell">
+                <div class="table-title">✅ الحجوزات المقبولة</div>
+
+                <div class="table-wrap">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>الدكتور</th>
+                                <th>التخصص</th>
+                                <th>التاريخ</th>
+                                <th>الساعة</th>
+                                <th>التفاصيل</th>
+                                <th>الحالة / الحضور</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for appointment in normal_appointments %}
+                            {% if appointment.status == 'ACCEPTED' %}
+                                <tr
+                                    class="normal-appointment-row {% if appointment.is_past_datetime %}past-appointment-row{% else %}active-appointment-row{% endif %}"
+                                    data-date="{{ appointment.date|date:'Y-m-d' }}"
+                                >
+                                    <td>
+                                        <span class="doctor-name">
+                                            د.
+                                            {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}
+                                        </span>
+                                    </td>
+
+                                    <td>{{ appointment.doctor.specialty }}</td>
+                                    <td>{{ appointment.date|date:"Y-m-d" }}</td>
+                                    <td>{{ appointment.time|time:"h:i A" }}</td>
+
+                                    <td class="notes-cell">
+                                        {% if appointment.notes %}
+                                            {{ appointment.notes }}
+                                        {% else %}
+                                            كشف عادي
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <span class="status accepted">
+                                            ✅ تم القبول
+                                        </span>
+
+                                        <div style="margin-top:6px;">
+                                            {% if appointment.attendance == 'ATTENDED' %}
+                                                <span class="status attended">
+                                                    ✅ حضر
+                                                </span>
+                                            {% elif appointment.attendance == 'ABSENT' %}
+                                                <span class="status absent">
+                                                    ❌ لم يحضر
+                                                </span>
+                                            {% elif appointment.can_mark_attendance %}
+                                                <span class="status waiting">
+                                                    ⏳ في انتظار تسجيل الحضور
+                                                </span>
+                                            {% else %}
+                                                <span class="status waiting">
+                                                    ⏳ في انتظار موعد الكشف
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                href="{% url 'chat' appointment.doctor.id %}"
+                                                class="chat-button"
+                                            >
+                                                💬 التحدث مع الطبيب
+                                            </a>
+                                        </div>
+
+                                        {% if appointment.can_rate %}
+                                            <div class="rating-box">
+                                                <div class="rating-title">
+                                                    ⭐ قيّم تجربتك مع الطبيب
+                                                </div>
+
+                                                <form
+                                                    method="POST"
+                                                    action="{% url 'rate_doctor' appointment.id %}"
+                                                >
+                                                    {% csrf_token %}
+
+                                                    <select
+                                                        name="rating"
+                                                        class="rating-select"
+                                                        required
+                                                    >
+                                                        <option value="">
+                                                            اختر التقييم
+                                                        </option>
+                                                        <option value="5">
+                                                            ⭐⭐⭐⭐⭐ ممتاز
+                                                        </option>
+                                                        <option value="4">
+                                                            ⭐⭐⭐⭐ جيد جدًا
+                                                        </option>
+                                                        <option value="3">
+                                                            ⭐⭐⭐ جيد
+                                                        </option>
+                                                        <option value="2">
+                                                            ⭐⭐ مقبول
+                                                        </option>
+                                                        <option value="1">
+                                                            ⭐ سيئ
+                                                        </option>
+                                                    </select>
+
+                                                    <textarea
+                                                        name="comment"
+                                                        class="rating-comment"
+                                                        placeholder="اكتب تعليقك (اختياري)"
+                                                    ></textarea>
+
+                                                    <button
+                                                        type="submit"
+                                                        class="rating-button"
+                                                    >
+                                                        ⭐ إرسال التقييم
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                        {% elif appointment.attendance == 'ATTENDED' and appointment.is_rated %}
+
+                                            <div class="rating-box">
+                                                <div class="rating-done">
+                                                    ⭐ تم تقييم الطبيب
+                                                </div>
+                                            </div>
+
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-box">
+                                        لا توجد حجوزات مقبولة.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        {% elif request.GET.status == 'rejected' %}
+
+            <div class="table-shell">
+                <div class="table-title">❌ الحجوزات المرفوضة</div>
+
+                <div class="table-wrap">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>الدكتور</th>
+                                <th>التخصص</th>
+                                <th>التاريخ</th>
+                                <th>الساعة</th>
+                                <th>التفاصيل</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for appointment in normal_appointments %}
+                            {% if appointment.status == 'REJECTED' %}
+                                <tr
+                                    class="normal-appointment-row {% if appointment.is_past_datetime %}past-appointment-row{% else %}active-appointment-row{% endif %}"
+                                    data-date="{{ appointment.date|date:'Y-m-d' }}"
+                                >
+                                    <td>
+                                        <span class="doctor-name">
+                                            د.
+                                            {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}
+                                        </span>
+                                    </td>
+
+                                    <td>{{ appointment.doctor.specialty }}</td>
+                                    <td>{{ appointment.date|date:"Y-m-d" }}</td>
+                                    <td>{{ appointment.time|time:"h:i A" }}</td>
+
+                                    <td class="notes-cell">
+                                        {% if appointment.notes %}
+                                            {{ appointment.notes }}
+                                        {% else %}
+                                            كشف عادي
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <span class="status rejected">
+                                            ❌ تم الرفض
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-box">
+                                        لا توجد حجوزات مرفوضة.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        {% endif %}
+
+        <div
+            id="normal-day-empty"
+            class="empty-day"
+            style="display:none;"
+        >
+            لا توجد مواعيد في اليوم المحدد.
+        </div>
+
+    {% else %}
+
+        {% if follow_up_notifications_count %}
+            <div class="follow-alert">
+                🔔 لديك موعد إعادة كشف جديد. افتح الموعد بالأسفل لمعرفة التاريخ والساعة والتفاصيل.
+            </div>
+        {% endif %}
+
+        {% if next_follow_up_appointment %}
+            <section class="next-panel follow">
+                <div class="next-title">🔄 إعادة الكشف اللي عليها الدور</div>
+
+                <div class="next-grid">
+                    <div class="next-item">
+                        <span class="next-label">👨‍⚕️ الدكتور</span>
+                        <span class="next-value">
+                            د.
+                            {{ next_follow_up_appointment.doctor.user.get_full_name|default:next_follow_up_appointment.doctor.user.username }}
+                        </span>
+                    </div>
+
+                    <div class="next-item">
+                        <span class="next-label">🩺 التخصص</span>
+                        <span class="next-value">
+                            {{ next_follow_up_appointment.doctor.specialty }}
+                        </span>
+                    </div>
+
+                    <div class="next-item">
+                        <span class="next-label">📅 التاريخ</span>
+                        <span class="next-value">
+                            {{ next_follow_up_appointment.date|date:"Y-m-d" }}
+                        </span>
+                    </div>
+
+                    <div class="next-item">
+                        <span class="next-label">🕐 الساعة</span>
+                        <span class="next-value">
+                            {{ next_follow_up_appointment.time|time:"h:i A" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="next-item next-details">
+                    <span class="next-label">📝 التفاصيل</span>
+                    <span class="next-value">
+                        {% if next_follow_up_appointment.notes %}
+                            {{ next_follow_up_appointment.notes }}
+                        {% else %}
+                            إعادة كشف
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="next-status">
+                    ✅ إعادة الكشف القادمة المؤكدة
+                </div>
+
+                <a
+                    href="{% url 'chat' next_follow_up_appointment.doctor.id %}"
+                    class="next-chat"
+                >
+                    💬 التحدث مع الطبيب
+                </a>
+            </section>
+        {% endif %}
+
+                <div class="follow-period-tabs patient-period-bar">
+            <button
+                type="button"
+                class="follow-period-tab active"
+                data-period="active"
+            >
+                ✅ المواعيد السارية
+            </button>
+
+            <button
+                type="button"
+                class="follow-period-tab"
+                data-period="past"
+            >
+                🕘 المواعيد الفائتة
+            </button>
+        </div>
+
+<section class="day-selector">
+
+            <div class="day-selector-title">
+                🔄 اختر اليوم لعرض إعادة الكشف الخاصة به
+            </div>
+
+            <div class="day-strip">
+
+                {% for day in week_days %}
+
+                    <button
+                        type="button"
+                        class="day-btn follow-day-btn"
+                        data-date="{{ day.date|date:'Y-m-d' }}"
+                    >
+                        <strong>{{ day.date|date:"l" }}</strong>
+                        <span>{{ day.date|date:"Y-m-d" }}</span>
+                    </button>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        <div class="day-date-search follow-day-search">
+            <input
+                type="date"
+                id="follow-date-search"
+                aria-label="البحث عن إعادة كشف بالتاريخ"
+            >
+            <button
+                type="button"
+                id="follow-date-search-btn"
+            >
+                🔎 بحث بالتاريخ
+            </button>
+            <button
+                type="button"
+                id="follow-date-clear-btn"
+                class="day-date-clear"
+            >
+                مسح
+            </button>
+        </div>
+
+        </div>
+
+        <div class="table-shell">
+
+            <div class="table-title">
+                🔄 مواعيد إعادة الكشف
+            </div>
+
+            <div class="table-wrap">
+
+                <table class="appointments-table follow-up-table">
+
+                    <thead>
+                        <tr>
+                            <th>الدكتور</th>
+                            <th>التخصص</th>
+                            <th>التاريخ</th>
+                            <th>الساعة</th>
+                            <th>التفاصيل</th>
+                            <th>الحالة</th>
+                            <th>الحضور</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for appointment in follow_up_appointments %}
+
+                        <tr
+                            class="follow-up-row {% if appointment.is_past_datetime %}past-follow-row{% else %}active-follow-row{% endif %}"
+                            data-date="{{ appointment.date|date:'Y-m-d' }}"
+                            data-time="{{ appointment.time|time:'H:i:s' }}"
+                        >
+
+                            <td>
+                                <span class="doctor-name">
+                                    د.
+                                    {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}
+                                </span>
+                            </td>
+
+                            <td>{{ appointment.doctor.specialty }}</td>
+                            <td>{{ appointment.date|date:"Y-m-d" }}</td>
+                            <td>{{ appointment.time|time:"h:i A" }}</td>
+
+                            <td class="notes-cell">
+                                {% if appointment.notes %}
+                                    {{ appointment.notes }}
+                                {% else %}
+                                    إعادة كشف
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if appointment.status == 'ACCEPTED' %}
+                                    <span class="status accepted">✅ مؤكد</span>
+                                {% elif appointment.status == 'REJECTED' %}
+                                    <span class="status rejected">❌ مرفوض</span>
+                                {% elif appointment.status == 'CANCELLED' %}
+                                    <span class="status cancelled">🚫 ملغي</span>
+                                {% else %}
+                                    <span class="status pending">⏳ قيد الانتظار</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+
+                                {% if appointment.status == 'ACCEPTED' %}
+
+                                    {% if appointment.attendance == 'ATTENDED' %}
+
+                                        <span class="status attended">
+                                            ✅ حضر
+                                        </span>
+
+                                    {% elif appointment.attendance == 'ABSENT' %}
+
+                                        <span class="status absent">
+                                            ❌ لم يحضر
+                                        </span>
+
+                                    {% elif appointment.can_mark_attendance %}
+
+                                        <span class="status waiting">
+                                            ⏳ في انتظار تسجيل الحضور
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status waiting">
+                                            ⏳ في انتظار موعد إعادة الكشف
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="status cancelled">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if appointment.status == 'ACCEPTED' %}
+
+                                    <a
+                                        href="{% url 'chat' appointment.doctor.id %}"
+                                        class="chat-button"
+                                    >
+                                        💬 التحدث مع الطبيب
+                                    </a>
+
+                                {% endif %}
+
+                                {% if appointment.can_rate %}
+
+                                    <div class="rating-box">
+
+                                        <div class="rating-title">
+                                            ⭐ قيّم تجربتك مع الطبيب
+                                        </div>
+
+                                        <form
+                                            method="POST"
+                                            action="{% url 'rate_doctor' appointment.id %}"
+                                        >
+                                            {% csrf_token %}
+
+                                            <select
+                                                name="rating"
+                                                class="rating-select"
+                                                required
+                                            >
+                                                <option value="">
+                                                    اختر التقييم
+                                                </option>
+
+                                                <option value="5">
+                                                    ⭐⭐⭐⭐⭐ ممتاز
+                                                </option>
+
+                                                <option value="4">
+                                                    ⭐⭐⭐⭐ جيد جدًا
+                                                </option>
+
+                                                <option value="3">
+                                                    ⭐⭐⭐ جيد
+                                                </option>
+
+                                                <option value="2">
+                                                    ⭐⭐ مقبول
+                                                </option>
+
+                                                <option value="1">
+                                                    ⭐ سيئ
+                                                </option>
+                                            </select>
+
+                                            <textarea
+                                                name="comment"
+                                                class="rating-comment"
+                                                placeholder="اكتب تعليقك (اختياري)"
+                                            ></textarea>
+
+                                            <button
+                                                type="submit"
+                                                class="rating-button"
+                                            >
+                                                ⭐ إرسال التقييم
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                {% elif appointment.attendance == 'ATTENDED' and appointment.is_rated %}
+
+                                    <div class="rating-box">
+                                        <div class="rating-done">
+                                            ⭐ تم تقييم الطبيب
+                                        </div>
+                                    </div>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-box">
+                                    <div style="font-size:45px;">🔄</div>
+                                    <h3>لا توجد مواعيد إعادة كشف</h3>
+                                    <p>لم يحدد لك الطبيب أي موعد إعادة كشف حتى الآن.</p>
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <div
+            id="follow-up-day-empty"
+            class="empty-day"
+            style="display:none;"
+        >
+            لا توجد إعادة كشف في اليوم المحدد.
+        </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    function localDateString(){
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,"0");
+        const day = String(d.getDate()).padStart(2,"0");
+        return `${y}-${m}-${day}`;
+    }
+
+    const today = localDateString();
+
+    /* =====================================================
+       NORMAL APPOINTMENTS
+    ===================================================== */
+
+    const normalDayButtons = Array.from(
+        document.querySelectorAll(".normal-day-btn")
+    );
+
+    const normalRows = Array.from(
+        document.querySelectorAll(".normal-appointment-row")
+    );
+
+    const periodButtons = Array.from(
+        document.querySelectorAll(".appointment-period-tab")
+    );
+
+    const normalDateSearch =
+        document.getElementById("normal-date-search");
+
+    const normalDateSearchBtn =
+        document.getElementById("normal-date-search-btn");
+
+    const normalDateClearBtn =
+        document.getElementById("normal-date-clear-btn");
+
+    let normalPeriod = "active";
+    let normalDate = null;
+
+    function applyNormalFilters(){
+
+        normalRows.forEach(function(row){
+
+            const isPast =
+                row.classList.contains("past-appointment-row");
+
+            const rowPeriod =
+                isPast ? "past" : "active";
+
+            const periodMatch =
+                rowPeriod === normalPeriod;
+
+            const dateMatch =
+                !normalDate ||
+                row.dataset.date === normalDate;
+
+            row.style.display =
+                periodMatch && dateMatch
+                    ? ""
+                    : "none";
+        });
+
+        normalDayButtons.forEach(function(button){
+            button.classList.toggle(
+                "active",
+                !!normalDate &&
+                button.dataset.date === normalDate
+            );
+        });
+
+        const visibleRows =
+            normalRows.filter(
+                row => row.style.display !== "none"
+            );
+
+        const emptyBox =
+            document.getElementById("normal-day-empty");
+
+        if(emptyBox){
+            emptyBox.style.display =
+                visibleRows.length
+                    ? "none"
+                    : "block";
+        }
+    }
+
+    periodButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                normalPeriod =
+                    button.dataset.period;
+
+                periodButtons.forEach(function(item){
+                    item.classList.toggle(
+                        "active",
+                        item.dataset.period === normalPeriod
+                    );
+                });
+
+                /*
+                   لا نمسح التاريخ المختار عند تغيير
+                   "السارية / الفائتة" حتى يفضل المستخدم
+                   في نفس اليوم الذي اختاره.
+                */
+                applyNormalFilters();
+            }
+        );
+    });
+
+    normalDayButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                const date =
+                    button.dataset.date;
+
+                normalDate =
+                    normalDate === date
+                        ? null
+                        : date;
+
+                if(normalDateSearch){
+                    normalDateSearch.value =
+                        normalDate || "";
+                }
+
+                /*
+                   لو اختار المستخدم يومًا قديمًا من شريط الأيام،
+                   نعرضه تلقائيًا من قسم المواعيد الفائتة.
+                   ولو اختار يومًا مستقبليًا نعرض السارية.
+                */
+                if(normalDate){
+                    const rowsForDate =
+                        normalRows.filter(
+                            row => row.dataset.date === normalDate
+                        );
+
+                    if(rowsForDate.length){
+                        const hasActive =
+                            rowsForDate.some(
+                                row => row.classList.contains(
+                                    "active-appointment-row"
+                                )
+                            );
+
+                        const hasPast =
+                            rowsForDate.some(
+                                row => row.classList.contains(
+                                    "past-appointment-row"
+                                )
+                            );
+
+                        if(hasActive && !hasPast){
+                            normalPeriod = "active";
+                        }else if(hasPast && !hasActive){
+                            normalPeriod = "past";
+                        }
+                    }
+                }
+
+                periodButtons.forEach(function(item){
+                    item.classList.toggle(
+                        "active",
+                        item.dataset.period === normalPeriod
+                    );
+                });
+
+                applyNormalFilters();
+            }
+        );
+    });
+
+    function runNormalDateSearch(){
+
+        if(!normalDateSearch){
+            return;
+        }
+
+        const selectedDate =
+            normalDateSearch.value || null;
+
+        normalDate = selectedDate;
+
+        /*
+           البحث بالتاريخ لا يقتصر على week_days.
+           لذلك يمكن البحث في أي تاريخ موجود في
+           normal_appointments حتى لو كان بعيدًا عن الأسبوع.
+        */
+        if(normalDate){
+
+            const rowsForDate =
+                normalRows.filter(
+                    row => row.dataset.date === normalDate
+                );
+
+            if(rowsForDate.length){
+
+                const hasActive =
+                    rowsForDate.some(
+                        row => row.classList.contains(
+                            "active-appointment-row"
+                        )
+                    );
+
+                const hasPast =
+                    rowsForDate.some(
+                        row => row.classList.contains(
+                            "past-appointment-row"
+                        )
+                    );
+
+                if(hasActive && !hasPast){
+                    normalPeriod = "active";
+                }else if(hasPast && !hasActive){
+                    normalPeriod = "past";
+                }
+            }
+        }
+
+        periodButtons.forEach(function(item){
+            item.classList.toggle(
+                "active",
+                item.dataset.period === normalPeriod
+            );
+        });
+
+        applyNormalFilters();
+    }
+
+    if(normalDateSearchBtn){
+        normalDateSearchBtn.addEventListener(
+            "click",
+            runNormalDateSearch
+        );
+    }
+
+    if(normalDateSearch){
+        normalDateSearch.addEventListener(
+            "change",
+            runNormalDateSearch
+        );
+
+        normalDateSearch.addEventListener(
+            "keydown",
+            function(event){
+                if(event.key === "Enter"){
+                    event.preventDefault();
+                    runNormalDateSearch();
+                }
+            }
+        );
+    }
+
+    if(normalDateClearBtn){
+        normalDateClearBtn.addEventListener(
+            "click",
+            function(){
+
+                if(normalDateSearch){
+                    normalDateSearch.value = "";
+                }
+
+                normalDate = null;
+
+                applyNormalFilters();
+            }
+        );
+    }
+
+    /*
+       عند فتح الصفحة نعرض كل المواعيد السارية،
+       ولا نفرض فلتر اليوم تلقائيًا.
+       اليوم يتم اختياره فقط عندما يضغط المستخدم عليه
+       أو يبحث عنه بالتاريخ.
+    */
+    normalDate = null;
+
+    if(normalDateSearch){
+        normalDateSearch.value =
+            normalDate || "";
+    }
+
+    periodButtons.forEach(function(button){
+        button.classList.toggle(
+            "active",
+            button.dataset.period === "active"
+        );
+    });
+
+    applyNormalFilters();
+
+
+    /* =====================================================
+       FOLLOW-UP APPOINTMENTS
+    ===================================================== */
+
+    const followDayButtons = Array.from(
+        document.querySelectorAll(".follow-day-btn")
+    );
+
+    const followRows = Array.from(
+        document.querySelectorAll(".follow-up-row")
+    );
+
+    const followPeriodButtons = Array.from(
+        document.querySelectorAll(".follow-period-tab")
+    );
+
+    const followDateSearch =
+        document.getElementById("follow-date-search");
+
+    const followDateSearchBtn =
+        document.getElementById("follow-date-search-btn");
+
+    const followDateClearBtn =
+        document.getElementById("follow-date-clear-btn");
+
+    let followPeriod = "active";
+    let followDate = null;
+
+    function getFollowRowPeriod(row){
+
+        const rowDate =
+            row.dataset.date || "";
+
+        const rowTime =
+            row.dataset.time || "00:00:00";
+
+        const rowDateTime =
+            new Date(
+                rowDate + "T" + rowTime
+            );
+
+        const isPast =
+            !Number.isNaN(rowDateTime.getTime())
+                ? rowDateTime <= new Date()
+                : row.classList.contains("past-follow-row");
+
+        return isPast ? "past" : "active";
+    }
+
+    function applyFollowFilters(){
+
+        followRows.forEach(function(row){
+
+            const rowPeriod =
+                getFollowRowPeriod(row);
+
+            const periodMatch =
+                rowPeriod === followPeriod;
+
+            const dateMatch =
+                !followDate ||
+                row.dataset.date === followDate;
+
+            row.style.display =
+                periodMatch && dateMatch
+                    ? ""
+                    : "none";
+        });
+
+        followDayButtons.forEach(function(button){
+            button.classList.toggle(
+                "active",
+                !!followDate &&
+                button.dataset.date === followDate
+            );
+        });
+
+        const visibleRows =
+            followRows.filter(
+                row => row.style.display !== "none"
+            );
+
+        const emptyBox =
+            document.getElementById(
+                "follow-up-day-empty"
+            );
+
+        if(emptyBox){
+            emptyBox.style.display =
+                visibleRows.length
+                    ? "none"
+                    : "block";
+        }
+    }
+
+    followPeriodButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                followPeriod =
+                    button.dataset.period;
+
+                followPeriodButtons.forEach(
+                    function(item){
+                        item.classList.toggle(
+                            "active",
+                            item.dataset.period === followPeriod
+                        );
+                    }
+                );
+
+                /*
+                   لا نمسح التاريخ عند تغيير السارية / الفائتة.
+                */
+                applyFollowFilters();
+            }
+        );
+    });
+
+    followDayButtons.forEach(function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                const date =
+                    button.dataset.date;
+
+                followDate =
+                    followDate === date
+                        ? null
+                        : date;
+
+                if(followDateSearch){
+                    followDateSearch.value =
+                        followDate || "";
+                }
+
+                if(followDate){
+
+                    const rowsForDate =
+                        followRows.filter(
+                            row => row.dataset.date === followDate
+                        );
+
+                    if(rowsForDate.length){
+
+                        const hasActive =
+                            rowsForDate.some(
+                                row =>
+                                    getFollowRowPeriod(row) === "active"
+                            );
+
+                        const hasPast =
+                            rowsForDate.some(
+                                row =>
+                                    getFollowRowPeriod(row) === "past"
+                            );
+
+                        if(hasActive && !hasPast){
+                            followPeriod = "active";
+                        }else if(hasPast && !hasActive){
+                            followPeriod = "past";
+                        }
+                    }
+                }
+
+                followPeriodButtons.forEach(
+                    function(item){
+                        item.classList.toggle(
+                            "active",
+                            item.dataset.period === followPeriod
+                        );
+                    }
+                );
+
+                applyFollowFilters();
+            }
+        );
+    });
+
+    function runFollowDateSearch(){
+
+        if(!followDateSearch){
+            return;
+        }
+
+        const selectedDate =
+            followDateSearch.value || null;
+
+        followDate = selectedDate;
+
+        /*
+           البحث بالتاريخ يعمل على كل follow_up_appointments
+           وليس فقط الأيام الظاهرة في week_days.
+        */
+        if(followDate){
+
+            const rowsForDate =
+                followRows.filter(
+                    row => row.dataset.date === followDate
+                );
+
+            if(rowsForDate.length){
+
+                const hasActive =
+                    rowsForDate.some(
+                        row =>
+                            getFollowRowPeriod(row) === "active"
+                    );
+
+                const hasPast =
+                    rowsForDate.some(
+                        row =>
+                            getFollowRowPeriod(row) === "past"
+                    );
+
+                if(hasActive && !hasPast){
+                    followPeriod = "active";
+                }else if(hasPast && !hasActive){
+                    followPeriod = "past";
+                }
+            }
+        }
+
+        followPeriodButtons.forEach(
+            function(item){
+                item.classList.toggle(
+                    "active",
+                    item.dataset.period === followPeriod
+                );
+            }
+        );
+
+        applyFollowFilters();
+    }
+
+    if(followDateSearchBtn){
+        followDateSearchBtn.addEventListener(
+            "click",
+            runFollowDateSearch
+        );
+    }
+
+    if(followDateSearch){
+        followDateSearch.addEventListener(
+            "change",
+            runFollowDateSearch
+        );
+
+        followDateSearch.addEventListener(
+            "keydown",
+            function(event){
+                if(event.key === "Enter"){
+                    event.preventDefault();
+                    runFollowDateSearch();
+                }
+            }
+        );
+    }
+
+    if(followDateClearBtn){
+        followDateClearBtn.addEventListener(
+            "click",
+            function(){
+
+                if(followDateSearch){
+                    followDateSearch.value = "";
+                }
+
+                followDate = null;
+
+                applyFollowFilters();
+            }
+        );
+    }
+
+    /*
+       عند فتح إعادة الكشف نعرض كل المواعيد السارية،
+       ولا نفرض فلتر اليوم تلقائيًا.
+       اليوم يتم اختياره فقط عندما يضغط المستخدم عليه
+       أو يبحث عنه بالتاريخ.
+    */
+    followDate = null;
+
+    if(followDateSearch){
+        followDateSearch.value =
+            followDate || "";
+    }
+
+    applyFollowFilters();
+
+});
+</script>
+
+{% endblock %}

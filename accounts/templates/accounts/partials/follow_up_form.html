@@ -1,0 +1,90 @@
+<div id="followup-{{ appointment.id }}" class="follow-up-form">
+
+    <div class="follow-title">
+        🔄 تحديد موعد إعادة الكشف
+    </div>
+
+    <form
+        method="POST"
+        action="{% url 'create_follow_up' appointment.id %}"
+        class="follow-up-submit-form"
+    >
+        {% csrf_token %}
+
+        <div class="picker-label">
+            📅 اختر اليوم
+        </div>
+
+        <div class="follow-days">
+
+            {% for follow_day in follow_up_days %}
+
+                <button
+                    type="button"
+                    class="day-btn follow-up-day"
+                    data-appointment-id="{{ appointment.id }}"
+                    data-date="{{ follow_day.date|date:'Y-m-d' }}"
+                >
+                    <strong>
+                        {{ follow_day.weekday_name }}
+                    </strong>
+
+                    <span>
+                        {{ follow_day.date|date:'m-d' }}
+                    </span>
+                </button>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="picker-label">
+            🕐 اختر الساعة
+        </div>
+
+        <div
+            id="follow-up-time-list-{{ appointment.id }}"
+            class="time-list"
+        >
+            <div class="empty-times">
+                اختر اليوم أولًا
+            </div>
+        </div>
+
+        <input
+            type="hidden"
+            name="date"
+            id="follow-up-date-{{ appointment.id }}"
+            required
+        >
+
+        <input
+            type="hidden"
+            name="time"
+            id="follow-up-time-{{ appointment.id }}"
+            required
+        >
+
+        <textarea
+            name="notes"
+            placeholder="تفاصيل إعادة الكشف..."
+        ></textarea>
+
+        <button
+            type="submit"
+            class="follow-up-submit"
+        >
+            ✅ تأكيد إعادة الكشف
+        </button>
+
+        <button
+            type="button"
+            class="follow-up-cancel"
+            data-target="followup-{{ appointment.id }}"
+        >
+            إلغاء
+        </button>
+
+    </form>
+
+</div>

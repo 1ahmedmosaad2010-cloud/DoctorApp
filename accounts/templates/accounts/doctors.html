@@ -1,0 +1,369 @@
+
+<style id="doctor-card-action-labels-only">
+.doctor-card .doctor-card-actions,
+.doctor-card .doctor-actions,
+.doctor-card .card-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+}
+
+.doctor-card .doctor-card-actions > *,
+.doctor-card .doctor-actions > *,
+.doctor-card .card-actions > * {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow: visible !important;
+}
+
+.doctor-card .doctor-card-actions > * .icon,
+.doctor-card .doctor-actions > * .icon,
+.doctor-card .card-actions > * .icon,
+.doctor-card .doctor-card-actions > * i,
+.doctor-card .doctor-actions > * i,
+.doctor-card .card-actions > * i {
+    display: block !important;
+    margin-bottom: 4px !important;
+}
+
+@media (max-width: 600px) {
+    .doctor-card .doctor-card-actions,
+    .doctor-card .doctor-actions,
+    .doctor-card .card-actions {
+        gap: 6px !important;
+    }
+
+    .doctor-card .doctor-card-actions > *,
+    .doctor-card .doctor-actions > *,
+    .doctor-card .card-actions > * {
+        padding: 8px 4px !important;
+        font-size: 11px !important;
+        line-height: 1.25 !important;
+    }
+}
+</style>
+
+{% extends "accounts/base.html" %}
+
+{% block title %}
+    الأطباء - MY DOCTOR
+{% endblock %}
+
+{% block content %}
+
+<style>
+/* التعديل الوحيد: أزرار كارت الدكتور الثلاثة جنب بعض، والاسم ظاهر على الموبايل */
+.doctors-page .doctor-card-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: stretch;
+    margin-top: 12px;
+}
+
+.doctors-page .doctor-card-actions .doctor-button {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    margin: 0 !important;
+    padding: 10px 6px;
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    font-size: 14px !important;
+    color: #334155 !important;
+    text-indent: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    text-decoration: none !important;
+}
+
+/* اسم الزر يظهر أسفل الأيقونة بدون تغيير باقي التصميم */
+.doctors-page .doctor-card-actions .doctor-button .doctor-action-icon {
+    display: block !important;
+    flex: 0 0 auto !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+    margin: 0 0 5px !important;
+}
+
+.doctors-page .doctor-card-actions .doctor-button .doctor-action-label {
+    display: block !important;
+    flex: 0 0 auto !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    color: #0f766e !important;
+    font-weight: 700 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 600px) {
+    .doctors-page .doctor-card-actions {
+        gap: 5px;
+    }
+
+    .doctors-page .doctor-card-actions .doctor-button {
+        padding: 8px 3px;
+        font-size: 11px !important;
+        min-height: 44px;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 600px) {
+    .doctors-page .doctor-card-actions .doctor-button .doctor-action-icon {
+        font-size: 20px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .doctors-page .doctor-card-actions .doctor-button .doctor-action-label {
+        font-size: 12px !important;
+        color: #0f766e !important;
+        font-weight: 700 !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .doctors-page .doctor-card-actions {
+        gap: 4px;
+    }
+
+    .doctors-page .doctor-card-actions .doctor-button {
+        padding: 7px 2px;
+        font-size: 10px !important;
+        min-height: 42px;
+    }
+}
+</style>
+
+<div class="doctors-page">
+
+
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
+    <div class="doctors-header">
+
+
+        <!-- العودة للصفحة الرئيسية -->
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="back-home"
+        >
+            🏠 العودة إلى الصفحة الرئيسية
+        </a>
+
+
+        <div>
+
+            <h1>
+                👨‍⚕️ الأطباء
+            </h1>
+
+            <p>
+                اختر الطبيب الذي تريد التواصل معه أو حجز موعد معه
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- DOCTORS -->
+    <!-- ========================= -->
+
+    <div class="doctors-grid">
+
+
+        {% for doctor in doctors %}
+
+
+            <div class="doctor-card">
+
+
+                <!-- Doctor Avatar -->
+
+                <div class="doctor-avatar">
+                    👨‍⚕️
+                </div>
+
+
+                <!-- Doctor Name -->
+
+                <h2>
+
+                    د.
+
+                    {{ doctor.user.first_name }}
+
+                    {{ doctor.user.last_name }}
+
+                </h2>
+
+
+                <!-- Specialty -->
+
+                <p class="specialty">
+
+                    {{ doctor.specialty }}
+
+                </p>
+
+
+                <!-- Bio -->
+
+                {% if doctor.bio %}
+
+                    <p>
+                        {{ doctor.bio }}
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        طبيب في MY DOCTOR
+                    </p>
+
+                {% endif %}
+
+
+                <!-- Phone -->
+
+                {% if doctor.user.phone %}
+
+                    <p>
+
+                        📱
+
+                        <strong>
+                            رقم الهاتف:
+                        </strong>
+
+                        {{ doctor.user.phone }}
+
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        📱 رقم الهاتف غير متوفر
+                    </p>
+
+                {% endif %}
+
+
+                <!-- Availability -->
+
+                {% if doctor.is_available %}
+
+                    <p class="doctor-status available">
+
+                        🟢 متاح الآن
+
+                    </p>
+
+                {% else %}
+
+                    <p class="doctor-status unavailable">
+
+                        🔴 غير متاح حاليًا
+
+                    </p>
+
+                {% endif %}
+
+
+                <div class="doctor-card-actions">
+
+                    <!-- Chat -->
+
+                    <a
+                        href="{% url 'chat' doctor.id %}"
+                        class="doctor-button"
+                    >
+                        <span class="doctor-action-icon">💬</span>
+                        <span class="doctor-action-label">مراسلة</span>
+                    </a>
+
+
+                    <!-- Appointment -->
+
+                    {% if doctor.is_available %}
+
+                        <a
+                            href="{% url 'book_appointment' doctor.id %}"
+                            class="doctor-button"
+                        >
+                            <span class="doctor-action-icon">📅</span>
+                            <span class="doctor-action-label">حجز موعد</span>
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- Reviews -->
+
+                    <a
+                        href="{% url 'doctor_reviews' doctor.id %}"
+                        class="doctor-button"
+                    >
+                        <span class="doctor-action-icon">⭐</span>
+                        <span class="doctor-action-label">التقييمات</span>
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+        {% empty %}
+
+
+            <!-- No Doctors -->
+
+            <div class="empty-doctors">
+
+                <h2>
+                    لا يوجد أطباء حاليًا
+                </h2>
+
+                <p>
+                    سيتم ظهور الأطباء هنا عند إضافتهم
+                    من لوحة الإدارة.
+                </p>
+
+            </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}
